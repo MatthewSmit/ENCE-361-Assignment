@@ -1,5 +1,7 @@
 #include "config.h"
 
+#include <stdio.h>
+
 #include "driverlib/adc.h"
 #include "driverlib/gpio.h"
 #include "driverlib/interrupt.h"
@@ -12,6 +14,7 @@
 
 #define SYSTICK_RATE_HZ  1000
 
+// PWM Defines
 #define PWM_MAIN_BASE          PWM0_BASE
 #define PWM_MAIN_GEN         PWM_GEN_3
 #define PWM_MAIN_OUTNUM      PWM_OUT_7
@@ -31,6 +34,7 @@
 #define PIN_BUFFER_SIZE 10
 
 static volatile u32 timeCount = 0;
+
 static volatile u32 pinTicks[PIN_BUFFER_SIZE] = {};
 static volatile u32 pinTickPtr = 0;
 
@@ -104,6 +108,25 @@ void PinChangeHandler() {
     pinTickPtr = (pinTickPtr + 1) % PIN_BUFFER_SIZE;
 }
 
+u32 CalculateFrequency() {
+    u32 sum = 0;
+    for (int i = 0; i < PIN_BUFFER_SIZE; i++)
+        sum += pinTicks[i];
+    sum /= PIN_BUFFER_SIZE;
+    return 1000 / sum;
+}
+
+void Draw(u32 frequency, u32 dutyCycle) {
+    OLEDStringDraw("Milestone 1", 0, 0);
+
+    char stringBuffer[20];
+    sprintf(stringBuffer, "Freq: %d Hz", frequency);
+    OLEDStringDraw(stringBuffer, 0, 2);
+
+    sprintf(stringBuffer, "Duty Cycle: %d%%", dutyCycle);
+    OLEDStringDraw(stringBuffer, 0, 3);
+}
+
 int main() {
     InitialiseClock();
     InitialisePWM();
@@ -115,18 +138,17 @@ int main() {
 
     IntMasterEnable();
 
-    int divider = PWM_START_RATE_HZ;
+    int frequency = PWM_START_RATE_HZ;
     int dutyCycle = PWM_START_DC;
 	
 	while (true) {
-	    u32 sum = 0;
-	    for (int i = 0; i < PIN_BUFFER_SIZE; i++)
-	        sum += pinTicks[i];
-	    sum /= PIN_BUFFER_SIZE;
-	    u32 frequency = 1000 / sum;
+		u32 newFrequency = CalculateFrequency();
 
-	    char string[17];
-	    sprintf (string, "Hz = %d", frequency);
-	    OLEDStringDraw(string, 0, 3);
+		if (newFrequency != frequency && newFrequency != 0) {
+			SetPWM(newFrequency, dutyCycle);
+			frequency = newFrequency;
+		}
+
+		Draw(frequency, dutyCycle);
 	}
 }
