@@ -1,5 +1,6 @@
 .launches/
-.settings/
+#.settings/
 Debug/
+Release/
 
 #.*project
