@@ -1,72 +1,42 @@
 #include "config.h"
 
+#include <math.h>
 #include <stdio.h>
 
 #include "driverlib/adc.h"
 #include "driverlib/gpio.h"
 #include "driverlib/interrupt.h"
-#include "driverlib/pin_map.h"
-#include "driverlib/pwm.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/systick.h"
 
+#include "buttons.h"
 #include "OrbitOLEDInterface.h"
-
-#define SYSTICK_RATE_HZ  1000
-
-/* PWM Definitions */
-#define PWM_MAIN_BASE           PWM0_BASE
-#define PWM_MAIN_GEN            PWM_GEN_3
-#define PWM_MAIN_OUTNUM         PWM_OUT_7
-#define PWM_MAIN_OUTBIT         PWM_OUT_7_BIT
-#define PWM_MAIN_PERIPH_PWM     SYSCTL_PERIPH_PWM0
-#define PWM_MAIN_PERIPH_GPIO    SYSCTL_PERIPH_GPIOC
-#define PWM_MAIN_GPIO_BASE      GPIO_PORTC_BASE
-#define PWM_MAIN_GPIO_CONFIG    GPIO_PC5_M0PWM7
-#define PWM_MAIN_GPIO_PIN       GPIO_PIN_5
-
-#define PWM_DIVIDER_CODE        SYSCTL_PWMDIV_16
-#define PWM_DIVIDER             16
+#include "pwmManager.h"
 
 #define PWM_START_RATE_HZ       150
 #define PWM_START_DC            50
 
 #define PIN_BUFFER_SIZE 10
 
+// Range the SysTick timer counts in
+static uint32_t sysTickRange = 0;
+
+// Current MS count
 static volatile uint32_t timeCount = 0;
 
+// Last read MS time for pin changes
+static volatile uint32_t pinChangeLastMS = 0;
+
+// Current ticks in read representing pin changes
 static volatile uint32_t pinTicks[PIN_BUFFER_SIZE] = {};
 static volatile uint32_t pinTickPtr = 0;
 
 void SysTickHandler();
 void PinChangeHandler();
 
-void SetPWM(int frequency, int dutyCycle) {
-    uint32_t period = SysCtlClockGet() / PWM_DIVIDER / frequency;
-
-    PWMGenPeriodSet(PWM_MAIN_BASE, PWM_MAIN_GEN, period);
-    PWMPulseWidthSet(PWM_MAIN_BASE, PWM_MAIN_OUTNUM, period * dutyCycle / 100);
-}
-
 void InitialiseClock() {
+	// Sets the clock to 80 MHz
     SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
-    SysCtlPWMClockSet(PWM_DIVIDER_CODE);
-}
-
-void InitialisePWM() {
-    SysCtlPeripheralEnable(PWM_MAIN_PERIPH_PWM);
-    SysCtlPeripheralEnable(PWM_MAIN_PERIPH_GPIO);
-
-    GPIOPinConfigure(PWM_MAIN_GPIO_CONFIG);
-    GPIOPinTypePWM(PWM_MAIN_GPIO_BASE, PWM_MAIN_GPIO_PIN);
-
-    PWMGenConfigure(PWM_MAIN_BASE, PWM_MAIN_GEN, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
-
-    SetPWM(PWM_START_RATE_HZ, PWM_START_DC);
-
-    PWMGenEnable(PWM_MAIN_BASE, PWM_MAIN_GEN);
-
-    PWMOutputState(PWM_MAIN_BASE, PWM_MAIN_OUTBIT, false);
 }
 
 void InitialisePin() {
@@ -84,7 +54,9 @@ void InitialisePin() {
 }
 
 void InitialiseSysTick() {
-    SysTickPeriodSet(SysCtlClockGet() / SYSTICK_RATE_HZ);
+	// Sets the SysTick range to 1ms
+	sysTickRange = SysCtlClockGet() / 1000;
+    SysTickPeriodSet(sysTickRange);
     SysTickIntRegister(SysTickHandler);
     SysTickIntEnable();
     SysTickEnable();
@@ -92,49 +64,96 @@ void InitialiseSysTick() {
 
 void SysTickHandler() {
     timeCount++;
+    updateButtons();
 }
 
 void PinChangeHandler() {
-    static uint32_t lastCount = 0;
+    static uint32_t lastSysTick = 0;
 
     //Clear Interrupt
     GPIOIntClear(GPIO_PORTB_BASE, GPIO_PIN_0);
 
-    uint32_t currentCount = timeCount;
-    uint32_t difference = currentCount - lastCount;
-    lastCount = currentCount;
+    // Calculate frequency using the MS counter plus the current SysTick value
+    uint32_t sysTickValue = SysTickValueGet();
+    uint32_t msDifference = timeCount - pinChangeLastMS;
 
-    pinTicks[pinTickPtr] = difference;
+    // SysTick counts down
+    int32_t sysTickDifference = lastSysTick - sysTickValue;
+
+    // Handle SysTick overlap
+    if (sysTickDifference < 0)
+    {
+    	sysTickDifference += sysTickRange;
+    	msDifference--;
+    }
+
+    pinChangeLastMS = timeCount;
+    lastSysTick = sysTickValue;
+
+    // Converts the ms + SysTick into SysTick values
+    pinTicks[pinTickPtr] = sysTickDifference + msDifference * sysTickRange;
     pinTickPtr = (pinTickPtr + 1) % PIN_BUFFER_SIZE;
 }
 
+// Calculates frequency using pin change data
 uint32_t CalculateFrequency() {
-    uint32_t sum = 0;
+
+	// Sums and divides, uses 64 bit since it can get large
+    uint64_t sum = 0;
     for (int i = 0; i < PIN_BUFFER_SIZE; i++)
         sum += pinTicks[i];
     sum /= PIN_BUFFER_SIZE;
-    return 1000 / sum;
+
+    // Returns as a frequency
+    return SysCtlClockGet() / sum;
 }
 
+// Returns true if no pin change has been read in the last 1s
+bool PinChangeTimedOut() {
+	uint32_t difference = timeCount - pinChangeLastMS;
+	if (difference >= 1000)
+	{
+		pinChangeLastMS = timeCount - 1000;
+		return true;
+	}
+	return false;
+}
+
+static bool lastButtonState[NUM_BUTTONS] = {};
+
+bool IsButtonPressed(int button) {
+	if (button < 0 || button >= NUM_BUTTONS)
+		return false;
+
+	return !lastButtonState[button] && checkButton(button);
+}
+
+void ButtonStateUpdate() {
+	for (int i = 0; i < NUM_BUTTONS; i++)
+		lastButtonState[i] = checkButton(i);
+}
+
+// Draws the frequency and duty cycle on the OLED
 void Draw(uint32_t frequency, uint32_t dutyCycle) {
     OLEDStringDraw("Milestone 1", 0, 0);
 
     char stringBuffer[20];
-    sprintf(stringBuffer, "Freq: %d Hz", frequency);
+    sprintf(stringBuffer, "Freq: %d Hz  ", frequency);
     OLEDStringDraw(stringBuffer, 0, 2);
 
-    sprintf(stringBuffer, "Duty Cycle: %d%%", dutyCycle);
+    sprintf(stringBuffer, "Duty Cycle: %d%% ", dutyCycle);
     OLEDStringDraw(stringBuffer, 0, 3);
 }
 
 int main(void) {
     InitialiseClock();
-    InitialisePWM();
+    InitialisePWM(PWM_START_RATE_HZ, PWM_START_DC);
     InitialisePin();
     InitialiseSysTick();
+    initButtons();
     OLEDInitialise();
 
-    PWMOutputState(PWM_MAIN_BASE, PWM_MAIN_OUTBIT, true);
+    EnablePWM();
 
     IntMasterEnable();
 
@@ -144,10 +163,37 @@ int main(void) {
 	while (true) {
 		uint32_t newFrequency = CalculateFrequency();
 
+		if (PinChangeTimedOut())
+			newFrequency = PWM_START_RATE_HZ;
+
 		if (newFrequency != frequency && newFrequency != 0) {
-			SetPWM(newFrequency, dutyCycle);
+
+			// Clamp frequency to [100, 300] Hz
+			if (newFrequency < 100)
+				newFrequency = 100;
+
+			if (newFrequency > 300)
+				newFrequency = 300;
+
+			//SetPWM(newFrequency, dutyCycle);
 			frequency = newFrequency;
 		}
+
+		if (IsButtonPressed(BUT_DOWN))
+		{
+			dutyCycle -= 5;
+			if (dutyCycle < 5)
+				dutyCycle = 5;
+		}
+
+		if (IsButtonPressed(BUT_UP))
+		{
+			dutyCycle += 5;
+			if (dutyCycle > 95)
+				dutyCycle = 95;
+		}
+
+		ButtonStateUpdate();
 
 		Draw(frequency, dutyCycle);
 	}
