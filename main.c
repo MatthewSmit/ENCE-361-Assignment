@@ -166,8 +166,8 @@ int main(void) {
 		if (PinChangeTimedOut())
 			newFrequency = PWM_START_RATE_HZ;
 
-		if (newFrequency != frequency && newFrequency != 0) {
-
+		if (newFrequency != frequency && newFrequency != 0)
+		{
 			// Clamp frequency to [100, 300] Hz
 			if (newFrequency < 100)
 				newFrequency = 100;
@@ -175,23 +175,27 @@ int main(void) {
 			if (newFrequency > 300)
 				newFrequency = 300;
 
-			//SetPWM(newFrequency, dutyCycle);
+			SetPWM(newFrequency, dutyCycle);
 			frequency = newFrequency;
 		}
 
-		if (IsButtonPressed(BUT_DOWN))
-		{
-			dutyCycle -= 5;
-			if (dutyCycle < 5)
-				dutyCycle = 5;
-		}
+        if (IsButtonPressed(BUT_DOWN))
+        {
+            dutyCycle -= 5;
+            if (dutyCycle < 5)
+                dutyCycle = 5;
 
-		if (IsButtonPressed(BUT_UP))
-		{
-			dutyCycle += 5;
-			if (dutyCycle > 95)
-				dutyCycle = 95;
-		}
+            SetPWM(frequency, dutyCycle);
+        }
+
+        if (IsButtonPressed(BUT_UP))
+        {
+            dutyCycle += 5;
+            if (dutyCycle > 95)
+                dutyCycle = 95;
+
+            SetPWM(frequency, dutyCycle);
+        }
 
 		ButtonStateUpdate();
 
