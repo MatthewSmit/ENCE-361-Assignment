@@ -1,4 +1,4 @@
-.settings/
+.launches
 Debug/
-
-.*project
+Release/
+\.project
