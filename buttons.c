@@ -10,7 +10,9 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "inc/hw_gpio.h"
 #include "inc/hw_memmap.h"
+#include "inc/hw_types.h"
 #include "driverlib/gpio.h"
 #include "driverlib/sysctl.h"
 
@@ -60,6 +62,13 @@ void initButtons (void)
     GPIOPinTypeGPIOInput (BUT_LEFT_BASE, BUT_LEFT_PIN);
     GPIOPadConfigSet (BUT_LEFT_BASE, BUT_LEFT_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
 
+    /* Unlock PF0 so we can change it to a GPIO input
+    Once we have enabled (unlocked) the commit register then re-lock it
+    to prevent further changes.  PF0 is muxed with NMI thus a special case.*/
+    HWREG(BUT_RIGHT_BASE + GPIO_O_LOCK) = GPIO_LOCK_KEY;
+    HWREG(BUT_RIGHT_BASE + GPIO_O_CR) |= 0x01;
+    HWREG(BUT_RIGHT_BASE + GPIO_O_LOCK) = 0;
+
     SysCtlPeripheralEnable (BUT_RIGHT_PERIPH);
     GPIOPinTypeGPIOInput (BUT_RIGHT_BASE, BUT_RIGHT_PIN);
     GPIOPadConfigSet (BUT_RIGHT_BASE, BUT_RIGHT_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
@@ -84,7 +93,6 @@ void updateButtons (void)
     current_value[BUT_UP] = GPIOPinRead (BUT_UP_BASE, BUT_UP_PIN);
     current_value[BUT_DOWN] = GPIOPinRead (BUT_DOWN_BASE, BUT_DOWN_PIN);
     current_value[BUT_LEFT] = GPIOPinRead (BUT_LEFT_BASE, BUT_LEFT_PIN);
-    // FIXME Right button is always reading low on my board
     current_value[BUT_RIGHT] = GPIOPinRead (BUT_RIGHT_BASE, BUT_RIGHT_PIN);
 
     for (uint8_t i = 0; i < NUM_BUTTONS; i++)

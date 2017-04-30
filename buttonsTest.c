@@ -56,7 +56,7 @@ int main(void) {
 
     while (1)
     {
-//        updateButtons ();
+        updateButtons ();
         button = checkButton (BUT_RIGHT);
 
         char string[5];
