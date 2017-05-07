@@ -44,7 +44,5 @@ void initSerial(void) {
 
     GPIOPinTypeUART(UART_GPIO_BASE, UART_GPIO_RX_PIN | UART_GPIO_TX_PIN);
 
-    uint32_t test = UARTClockSourceGet(UART_BASE);
-
     UARTStdioConfig(0, BAUD_RATE, UART_PIOSC_FREQUENCY);
 }

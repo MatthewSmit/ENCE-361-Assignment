@@ -25,7 +25,7 @@
  *
  */
 
-void OLEDStringDraw(const char *pcStr, unsigned long ulColumn, unsigned long ulRow);
+void OLEDStringDraw(char *pcStr, unsigned long ulColumn, unsigned long ulRow);
 
 /*
  * OLEDInitialise
@@ -34,7 +34,7 @@ void OLEDStringDraw(const char *pcStr, unsigned long ulColumn, unsigned long ulR
  *
  *   	purpose:	Runs the initialise routines for the OLED display
  */
-void OLEDInitialise (void);
+void initOLED (void);
 
 
 #endif /* ORBITOLEDINTERFACE_H_ */

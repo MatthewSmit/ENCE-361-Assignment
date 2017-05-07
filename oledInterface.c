@@ -21,6 +21,8 @@
 #include "libOrbitOled/OrbitOledChar.h"
 #include "libOrbitOled/OrbitOledGrph.h"
 
+#include "oledInterface.h"
+
 //*****************************************************************************
 //
 //!
@@ -78,7 +80,7 @@ OLEDStringDraw(char *pcStr, unsigned long ulColumn, unsigned long ulRow)
  *   	purpose:	Runs the required initialiser routines for the OLED display
  *****************************************************************************/
 void
-OLEDInitialise (void){
+initOLED (void){
 
 	/*
 	 * Initialize the OLED

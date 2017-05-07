@@ -39,7 +39,7 @@ static void yawInterrupt() {
     state = pins;
 }
 
-void initialiseYawManager() {
+void initYawManager() {
     SysCtlPeripheralEnable(YAW_PERIPH_GPIO);
 
     GPIOPinTypeGPIOInput(YAW_PERIPH_BASE, BOTH_PINS);

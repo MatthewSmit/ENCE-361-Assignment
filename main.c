@@ -1,3 +1,7 @@
+/**
+ * Main Program
+ */
+
 #include "config.h"
 
 #include <math.h>
@@ -14,11 +18,11 @@
 #include "utils/ustdlib.h"
 
 #include "buttons.h"
-#include "OrbitOledInterface.h"
 #include "pwmManager.h"
 #include "yawManager.h"
 #include "serialInterface.h"
 #include "heightMonitor.h"
+#include "oledInterface.h"
 
 #define DEBUG true
 
@@ -103,13 +107,14 @@ void ButtonStateUpdate() {
 
 int main(void) {
     InitialiseClock();
+    InitialiseSysTick();
     InitialisePWM(PWM_START_RATE_HZ, PWM_START_DC);
     //InitialisePin();
-    initSerial();
-    InitialiseSysTick();
+
     initButtons();
-    initialiseYawManager();
-    OLEDInitialise();
+    initSerial();
+    initOLED();
+    initYawManager();
     initHeightMonitor();
 
 //    EnablePWM();
@@ -119,26 +124,23 @@ int main(void) {
     uint32_t frequency = PWM_START_RATE_HZ;
     uint32_t dutyCycle = PWM_START_DC;
 	while (true) {
-		/*uint32_t newFrequency = CalculateFrequency();
-#ifdef DEBUG
-        UARTprintf("Height: %4d\r", height);
-#endif
-
-		if (PinChangeTimedOut())
-			newFrequency = PWM_START_RATE_HZ;
-
-		if (newFrequency != frequency && newFrequency != 0)
-		{
-			// Clamp frequency to [100, 300] Hz
-			if (newFrequency < 100)
-				newFrequency = 100;
-
-			if (newFrequency > 300)
-				newFrequency = 300;
-
-			SetPWM(newFrequency, dutyCycle);
-			frequency = newFrequency;
-		}*/
+//	    uint32_t newFrequency = CalculateFrequency();
+//
+//		if (PinChangeTimedOut())
+//			newFrequency = PWM_START_RATE_HZ;
+//
+//		if (newFrequency != frequency && newFrequency != 0)
+//		{
+//			// Clamp frequency to [100, 300] Hz
+//			if (newFrequency < 100)
+//				newFrequency = 100;
+//
+//			if (newFrequency > 300)
+//				newFrequency = 300;
+//
+//			SetPWM(newFrequency, dutyCycle);
+//			frequency = newFrequency;
+//		}
 
         if (IsButtonPressed(BUT_DOWN))
         {
