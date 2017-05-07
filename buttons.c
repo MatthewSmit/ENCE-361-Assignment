@@ -64,7 +64,7 @@ void initButtons (void)
 
     /* Unlock PF0 so we can change it to a GPIO input
     Once we have enabled (unlocked) the commit register then re-lock it
-    to prevent further changes.  PF0 is muxed with NMI thus a special case.*/
+    to prevent further changes.  PF0 is muxed with NMI thus a special case. */
     HWREG(BUT_RIGHT_BASE + GPIO_O_LOCK) = GPIO_LOCK_KEY;
     HWREG(BUT_RIGHT_BASE + GPIO_O_CR) |= 0x01;
     HWREG(BUT_RIGHT_BASE + GPIO_O_LOCK) = 0;
