@@ -12,6 +12,7 @@
 #include "buttons.h"
 #include "OrbitOLEDInterface.h"
 #include "pwmManager.h"
+#include "yawManager.h"
 
 #define PWM_START_RATE_HZ       150
 #define PWM_START_DC            50
@@ -137,9 +138,22 @@ void ButtonStateUpdate() {
 void Draw(uint32_t frequency, uint32_t dutyCycle) {
     OLEDStringDraw("Milestone 1", 0, 0);
 
-    char stringBuffer[20];
-    sprintf(stringBuffer, "Freq: %d Hz  ", frequency);
+    char stringBuffer[30];
+    memset(stringBuffer, 0, sizeof(stringBuffer));
+
+    float yaw = getYawDegrees();
+    sprintf(stringBuffer, "Yaw: %d  ", (int)yaw);
+    OLEDStringDraw(stringBuffer, 0, 1);
+    memset(stringBuffer, 0, sizeof(stringBuffer));
+
+    uint32_t height = 0;
+    sprintf(stringBuffer, "Height: %d  ", height);
     OLEDStringDraw(stringBuffer, 0, 2);
+    memset(stringBuffer, 0, sizeof(stringBuffer));
+
+    //sprintf(stringBuffer, "Freq: %d Hz  ", frequency);
+    //OLEDStringDraw(stringBuffer, 0, 2);
+    //memset(stringBuffer, 0, sizeof(stringBuffer));
 
     sprintf(stringBuffer, "Duty Cycle: %d%% ", dutyCycle);
     OLEDStringDraw(stringBuffer, 0, 3);
@@ -148,9 +162,10 @@ void Draw(uint32_t frequency, uint32_t dutyCycle) {
 int main(void) {
     InitialiseClock();
     InitialisePWM(PWM_START_RATE_HZ, PWM_START_DC);
-    InitialisePin();
+    //InitialisePin();
     InitialiseSysTick();
     initButtons();
+    initialiseYawManager();
     OLEDInitialise();
 
     EnablePWM();
@@ -161,7 +176,7 @@ int main(void) {
     uint32_t dutyCycle = PWM_START_DC;
 	
 	while (true) {
-		uint32_t newFrequency = CalculateFrequency();
+		/*uint32_t newFrequency = CalculateFrequency();
 
 		if (PinChangeTimedOut())
 			newFrequency = PWM_START_RATE_HZ;
@@ -177,7 +192,7 @@ int main(void) {
 
 			SetPWM(newFrequency, dutyCycle);
 			frequency = newFrequency;
-		}
+		}*/
 
         if (IsButtonPressed(BUT_DOWN))
         {
