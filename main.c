@@ -64,7 +64,7 @@ void SysTickHandler() {
 }
 
 void Draw(uint32_t frequency, uint32_t dutyCycle) {
-    OLEDStringDraw("Milestone 1", 0, 0);
+    OLEDStringDraw("Milestone 2", 0, 0);
 
     char stringBuffer[30];
     memset(stringBuffer, 0, sizeof(stringBuffer));
@@ -78,10 +78,6 @@ void Draw(uint32_t frequency, uint32_t dutyCycle) {
     sprintf(stringBuffer, "Height: %d  ", height);
     OLEDStringDraw(stringBuffer, 0, 2);
     memset(stringBuffer, 0, sizeof(stringBuffer));
-
-    //sprintf(stringBuffer, "Freq: %d Hz  ", frequency);
-    //OLEDStringDraw(stringBuffer, 0, 2);
-    //memset(stringBuffer, 0, sizeof(stringBuffer));
 
     sprintf(stringBuffer, "Duty Cycle: %d%% ", dutyCycle);
     OLEDStringDraw(stringBuffer, 0, 3);
@@ -103,13 +99,12 @@ void ButtonStateUpdate() {
 
 int main(void) {
     InitialiseClock();
+    OLEDInitialise();
     InitialisePWM(PWM_START_RATE_HZ, PWM_START_DC);
-    //InitialisePin();
     initSerial();
     InitialiseSysTick();
     initButtons();
     initialiseYawManager();
-    OLEDInitialise();
     initHeightMonitor();
 
 //    EnablePWM();
@@ -119,10 +114,11 @@ int main(void) {
     uint32_t frequency = PWM_START_RATE_HZ;
     uint32_t dutyCycle = PWM_START_DC;
 	while (true) {
-		/*uint32_t newFrequency = CalculateFrequency();
 #ifdef DEBUG
-        UARTprintf("Height: %4d\r", height);
+	    uint32_t height = getHeight();
+        UARTprintf("Height: %4d\n", height);
 #endif
+		/*uint32_t newFrequency = CalculateFrequency();
 
 		if (PinChangeTimedOut())
 			newFrequency = PWM_START_RATE_HZ;
