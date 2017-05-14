@@ -15,15 +15,12 @@
 
 #include "buttons.h"
 #include "OrbitOledInterface.h"
-#include "pwmManager.h"
 #include "yawManager.h"
 #include "serialInterface.h"
 #include "heightMonitor.h"
+#include "pwmOutput.h"
 
-#define DEBUG true
-
-#define PWM_START_RATE_HZ       150
-#define PWM_START_DC            50
+#define DEBUG
 
 #define PIN_BUFFER_SIZE 10
 
@@ -63,7 +60,7 @@ void SysTickHandler() {
     updateHeight(); //triggers a height reading
 }
 
-void Draw(uint32_t frequency, uint32_t dutyCycle) {
+void Draw(uint32_t dutyCycle) {
     OLEDStringDraw("Milestone 1", 0, 0);
 
     char stringBuffer[30];
@@ -103,7 +100,7 @@ void ButtonStateUpdate() {
 
 int main(void) {
     InitialiseClock();
-    InitialisePWM(PWM_START_RATE_HZ, PWM_START_DC);
+    init_pwm();
     //InitialisePin();
     initSerial();
     InitialiseSysTick();
@@ -116,29 +113,9 @@ int main(void) {
 
     IntMasterEnable();
 
-    uint32_t frequency = PWM_START_RATE_HZ;
-    uint32_t dutyCycle = PWM_START_DC;
+//    uint32_t frequency = PWM_START_RATE_HZ;
+    uint32_t dutyCycle = 5;
 	while (true) {
-		/*uint32_t newFrequency = CalculateFrequency();
-#ifdef DEBUG
-        UARTprintf("Height: %4d\r", height);
-#endif
-
-		if (PinChangeTimedOut())
-			newFrequency = PWM_START_RATE_HZ;
-
-		if (newFrequency != frequency && newFrequency != 0)
-		{
-			// Clamp frequency to [100, 300] Hz
-			if (newFrequency < 100)
-				newFrequency = 100;
-
-			if (newFrequency > 300)
-				newFrequency = 300;
-
-			SetPWM(newFrequency, dutyCycle);
-			frequency = newFrequency;
-		}*/
 
         if (IsButtonPressed(BUT_DOWN))
         {
@@ -146,7 +123,7 @@ int main(void) {
             if (dutyCycle < 5)
                 dutyCycle = 5;
 
-            SetPWM(frequency, dutyCycle);
+            pwm_duty_cycle_set(MAIN_ROTOR, dutyCycle);
         }
 
         if (IsButtonPressed(BUT_UP))
@@ -155,11 +132,11 @@ int main(void) {
             if (dutyCycle > 95)
                 dutyCycle = 95;
 
-            SetPWM(frequency, dutyCycle);
+            pwm_duty_cycle_set(MAIN_ROTOR, dutyCycle);
         }
 
 		ButtonStateUpdate();
 
-		Draw(frequency, dutyCycle);
+		Draw(dutyCycle);
 	}
 }
