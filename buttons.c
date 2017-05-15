@@ -113,13 +113,6 @@ void UpdateButtons (void)
     }
 }
 
-//uint8_t checkButton (uint8_t button_name) {
-//    if (current_state[button_name] == default_state[button_name])
-//        return RELEASED;
-//    else
-//        return PUSHED;
-//}
-
 uint8_t NumPushes(uint8_t button_name) {
 	uint8_t tmp_pushes = pushes[button_name];
 	bool was_disabled = IntMasterDisable();

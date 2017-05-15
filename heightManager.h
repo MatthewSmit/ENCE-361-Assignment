@@ -1,18 +1,13 @@
-/*
- * heightMonitor.h
- *
- *  Created on: 7/05/2017
- *      Author: daniel
+/**
+ * @file heighManager.h
  */
 
-#include <stdint.h>
+#ifndef HEIGHT_MANAGER_H_
+#define HEIGHT_MANAGER_H_
 
-#ifndef HEIGHTMONITOR_H_
-#define HEIGHTMONITOR_H_
-
-uint32_t getHeight();
-uint32_t getHeightPercentage();
-void updateHeight();
+int32_t GetHeight();
+int32_t GetHeightPercentage();
+void UpdateHeight();
 void InitialiseHeightMonitor();
 
-#endif /* HEIGHTMONITOR_H_ */
+#endif /* HEIGHT_MANAGER_H_ */
