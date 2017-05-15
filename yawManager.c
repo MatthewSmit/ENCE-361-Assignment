@@ -7,9 +7,7 @@
 #include "driverlib/interrupt.h"
 #include "driverlib/sysctl.h"
 
-#include "yawManager.h"
-
-#define NUMBER_SLOTS 112
+#define NUMBER_SLOTS (112 * 4)
 
 #define YAW_PERIPH_GPIO     SYSCTL_PERIPH_GPIOB
 #define YAW_PERIPH_BASE     GPIO_PORTB_BASE
@@ -17,25 +15,34 @@
 #define PIN_B               GPIO_PIN_1
 #define BOTH_PINS           (PIN_A | PIN_B)
 
-static int yaw;
-static int state;
+typedef enum {
+    STATE_LOW,
+    STATE_A_HIGH,
+    STATE_B_HIGH,
+    STATE_BOTH_HIGH
+} YawState;
+
+static const int32_t states[] =
+{
+     0, +1, -1, 0,
+     -1, 0, 0, +1,
+     +1, 0, 0, -1,
+     0, -1, +1, 0
+};
+
+static int32_t yaw;
+static YawState oldState;
 
 static void yawInterrupt() {
+    YawState newState = (YawState)GPIOPinRead(YAW_PERIPH_BASE, BOTH_PINS);
 
-    int32_t pins = GPIOPinRead(YAW_PERIPH_BASE, BOTH_PINS);
     //Clear Interrupt
     GPIOIntClear(YAW_PERIPH_BASE, BOTH_PINS);
 
-    if (state == BOTH_PINS) {
-        if ((pins & PIN_B) == 0) {
-            yaw++;
-        }
-        else {
-            yaw--;
-        }
-    }
+    int32_t change = states[newState | (oldState << 2)];
+    yaw -= change;
 
-    state = pins;
+    oldState = newState;
 }
 
 void InitialiseYawManager() {
@@ -50,19 +57,20 @@ void InitialiseYawManager() {
     IntEnable(INT_GPIOB);
 }
 
-int getYaw() {
+int32_t getYaw() {
     return yaw;
 }
 
-float getYawDegrees() {
-    int tmpYaw = yaw;
-    tmpYaw %= NUMBER_SLOTS;
-    float value = (tmpYaw / (float)NUMBER_SLOTS) * 360;
+int32_t getYawDegrees() {
+    int32_t tmpYaw = yaw;
+    //tmpYaw %= NUMBER_SLOTS;
+    int32_t value = (tmpYaw * 360) / NUMBER_SLOTS;
+    //float value = (tmpYaw / (float)NUMBER_SLOTS) * 360;
 
     // Shift from [0, 360) to the range (-180, 180]
-    if (value > 180)
+    /*if (value > 180)
         return value - 360;
     if (value <= -180)
-        return value + 360;
+        return value + 360;*/
     return value;
 }

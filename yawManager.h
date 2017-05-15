@@ -1,5 +1,10 @@
-#pragma once
+#ifndef YAW_MANAGER_H_
+#define YAW_MANAGER_H_
 
-void InitialiseYawManager();
-int getYaw();
-float getYawDegrees();
+#include <stdint.h>
+
+void initialiseYawManager();
+int32_t getYaw();
+int32_t getYawDegrees();
+
+#endif
