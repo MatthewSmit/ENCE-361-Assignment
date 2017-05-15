@@ -45,6 +45,7 @@
 static bool default_state[NUM_BUTTONS];
 static bool current_state[NUM_BUTTONS];
 static uint16_t count[NUM_BUTTONS];
+static uint8_t pushes[NUM_BUTTONS]
 
 void initButtons (void)
 {
@@ -84,6 +85,7 @@ void initButtons (void)
     {
         current_state[i] = default_state[i];
         count[i] = 0;
+        pushes[i] = 0;
     }
 }
 
@@ -103,6 +105,7 @@ void updateButtons (void)
             {
                 count[i] = 0; // Reset the count
                 current_state[i] = current_value[i];
+                pushes[i]++;
             }
         }
         else
@@ -110,9 +113,19 @@ void updateButtons (void)
     }
 }
 
-uint8_t checkButton (uint8_t button_name) {
-    if (current_state[button_name] == default_state[button_name])
-        return RELEASED;
-    else
-        return PUSHED;
+//uint8_t checkButton (uint8_t button_name) {
+//    if (current_state[button_name] == default_state[button_name])
+//        return RELEASED;
+//    else
+//        return PUSHED;
+//}
+
+uint8_t numPushes(uint8_t button_name, bool reset) {
+	uint8_t tmp_pushes = pushes[button_name];
+	bool status = IntMasterDisable();
+	if (reset)
+		pushes[button_name] = 0;
+	if (status)
+		IntMasterEnable();
+	return tmp_pushes;
 }
