@@ -1,5 +1,5 @@
 #pragma once
 
-void initYawManager();
+void InitialiseYawManager();
 int getYaw();
 float getYawDegrees();

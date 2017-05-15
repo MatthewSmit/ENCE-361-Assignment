@@ -41,7 +41,7 @@
 #define PWM_DIVIDER_CODE        SYSCTL_PWMDIV_16
 #define PWM_DIVIDER             16
 
-void init_pwm(void) {
+void InitialisePwm() {
     SysCtlPWMClockSet(PWM_DIVIDER_CODE);
 
     uint32_t period = SysCtlClockGet() / PWM_DIVIDER / PWM_FREQUENCY;
@@ -57,7 +57,7 @@ void init_pwm(void) {
     PWMGenEnable(PWM_MAIN_BASE, PWM_MAIN_GEN);
 
     PWMGenPeriodSet(PWM_MAIN_BASE, PWM_MAIN_GEN, period);
-    pwm_disable(MAIN_ROTOR);
+    PwmDisable(MAIN_ROTOR);
 
     /* Initialise Tail Rotor */
     SysCtlPeripheralEnable(PWM_TAIL_PERIPH_GPIO);
@@ -70,10 +70,10 @@ void init_pwm(void) {
     PWMGenEnable(PWM_TAIL_BASE, PWM_TAIL_GEN);
 
     PWMGenPeriodSet(PWM_TAIL_BASE, PWM_TAIL_GEN, period);
-    pwm_disable(TAIL_ROTOR);
+    PwmDisable(TAIL_ROTOR);
 }
 
-void pwm_duty_cycle_set(uint8_t pwm_output, uint32_t duty_cycle) {
+void SetPwmDutyCycle(uint8_t pwm_output, uint32_t duty_cycle) {
 	uint32_t period = SysCtlClockGet() / PWM_DIVIDER / PWM_FREQUENCY;
 	switch (pwm_output) {
 	case MAIN_ROTOR:
@@ -85,7 +85,7 @@ void pwm_duty_cycle_set(uint8_t pwm_output, uint32_t duty_cycle) {
 	}
 }
 
-void pwm_state(uint8_t pwm_output, bool state) {
+void SetPwmState(uint8_t pwm_output, bool state) {
 	switch (pwm_output) {
 	case MAIN_ROTOR:
 		PWMOutputState(PWM_MAIN_BASE, PWM_MAIN_OUTBIT, state);
@@ -96,10 +96,10 @@ void pwm_state(uint8_t pwm_output, bool state) {
 	}
 }
 
-void pwm_enable(uint8_t pwm_output) {
-	pwm_state(pwm_output, true);
+void PwmEnable(uint8_t pwm_output) {
+    SetPwmState(pwm_output, true);
 }
 
-void pwm_disable(uint8_t pwm_output) {
-	pwm_state(pwm_output, false);
+void PwmDisable(uint8_t pwm_output) {
+    SetPwmState(pwm_output, false);
 }

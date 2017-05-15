@@ -10,9 +10,9 @@
 #ifndef HEIGHTMONITOR_H_
 #define HEIGHTMONITOR_H_
 
-uint32_t getHeight(void);
-uint32_t getHeightPercentage(void);
-void updateHeight(void);
-void initHeightMonitor(void);
+uint32_t getHeight();
+uint32_t getHeightPercentage();
+void updateHeight();
+void InitialiseHeightMonitor();
 
 #endif /* HEIGHTMONITOR_H_ */

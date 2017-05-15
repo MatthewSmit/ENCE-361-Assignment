@@ -30,7 +30,7 @@ void ADCInteruptHandler(void) {
     writeCircBuf(&g_buffer, pui32ADC0Value[0]);
 }
 
-void initHeightMonitor(void) {
+void InitialiseHeightMonitor(void) {
     initCircBuf(&g_buffer, 1);
 
     SysCtlPeripheralEnable(SYSCTL_PERIPH_ADC0);

@@ -26,7 +26,7 @@
 #define UART_PERIPH_UART        SYSCTL_PERIPH_UART0
 #define UART_PIOSC_FREQUENCY    16000000
 
-void initSerial(void) {
+void InitialiseSerial (void) {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
 
     GPIOPinConfigure(UART_GPIO_RX_CONFIG);

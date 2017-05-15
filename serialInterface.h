@@ -10,6 +10,6 @@
 
 #define BAUD_RATE 9600
 
-void initSerial(void);
+void InitialiseSerial (void);
 
 #endif /* SERIALINTERFACE_H_ */

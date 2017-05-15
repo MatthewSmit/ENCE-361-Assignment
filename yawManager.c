@@ -1,14 +1,13 @@
-#include "yawManager.h"
-
 #include <stdint.h>
 #include <stdbool.h>
 
 #include "inc/hw_memmap.h"
 #include "inc/tm4c123gh6pm.h"
-
 #include "driverlib/gpio.h"
 #include "driverlib/interrupt.h"
 #include "driverlib/sysctl.h"
+
+#include "yawManager.h"
 
 #define NUMBER_SLOTS 112
 
@@ -39,7 +38,7 @@ static void yawInterrupt() {
     state = pins;
 }
 
-void initYawManager() {
+void InitialiseYawManager() {
     SysCtlPeripheralEnable(YAW_PERIPH_GPIO);
 
     GPIOPinTypeGPIOInput(YAW_PERIPH_BASE, BOTH_PINS);
