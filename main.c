@@ -69,8 +69,8 @@ void Draw(uint32_t frequency, uint32_t dutyCycle) {
     char stringBuffer[30];
     memset(stringBuffer, 0, sizeof(stringBuffer));
 
-    float yaw = getYawDegrees();
-    sprintf(stringBuffer, "Yaw: %d  ", (int)yaw);
+    int32_t yaw = getYawDegrees();
+    sprintf(stringBuffer, "Yaw: %d  ", yaw);
     OLEDStringDraw(stringBuffer, 0, 1);
     memset(stringBuffer, 0, sizeof(stringBuffer));
 
@@ -118,23 +118,6 @@ int main(void) {
 	    uint32_t height = getHeight();
         UARTprintf("Height: %4d\n", height);
 #endif
-		/*uint32_t newFrequency = CalculateFrequency();
-
-		if (PinChangeTimedOut())
-			newFrequency = PWM_START_RATE_HZ;
-
-		if (newFrequency != frequency && newFrequency != 0)
-		{
-			// Clamp frequency to [100, 300] Hz
-			if (newFrequency < 100)
-				newFrequency = 100;
-
-			if (newFrequency > 300)
-				newFrequency = 300;
-
-			SetPWM(newFrequency, dutyCycle);
-			frequency = newFrequency;
-		}*/
 
         if (IsButtonPressed(BUT_DOWN))
         {
