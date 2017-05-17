@@ -26,6 +26,11 @@
 	</natures>
 	<linkedResources>
 		<link>
+			<name>scheduler.c</name>
+			<type>1</type>
+			<locationURI>TIVAWARE_DIR/utils/scheduler.c</locationURI>
+		</link>
+		<link>
 			<name>uartstdio.c</name>
 			<type>1</type>
 			<locationURI>TIVAWARE_DIR/utils/uartstdio.c</locationURI>
