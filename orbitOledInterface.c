@@ -18,7 +18,7 @@ void OledStringDraw(char *string_ptr, uint32_t x_char, uint32_t y_char) {
     OrbitOledPutString(string_ptr);
 }
 
-void InitialiseOled() {
+void OledInit() {
 	/*
 	 * Initialize the OLED display
 	 */

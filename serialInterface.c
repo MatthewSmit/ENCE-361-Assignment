@@ -18,6 +18,7 @@
 #include "serialInterface.h"
 
 #define UART_BASE               UART0_BASE
+#define UART_PORT               0
 #define UART_GPIO_BASE          GPIO_PORTA_BASE
 #define UART_GPIO_RX_CONFIG     GPIO_PA0_U0RX
 #define UART_GPIO_TX_CONFIG     GPIO_PA1_U0TX
@@ -26,7 +27,7 @@
 #define UART_PERIPH_UART        SYSCTL_PERIPH_UART0
 #define UART_PIOSC_FREQUENCY    16000000
 
-void InitialiseSerial (void) {
+void SerialInit() {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);
 
     GPIOPinConfigure(UART_GPIO_RX_CONFIG);
@@ -44,5 +45,5 @@ void InitialiseSerial (void) {
 
     GPIOPinTypeUART(UART_GPIO_BASE, UART_GPIO_RX_PIN | UART_GPIO_TX_PIN);
 
-    UARTStdioConfig(0, BAUD_RATE, UART_PIOSC_FREQUENCY);
+    UARTStdioConfig(UART_PORT, BAUD_RATE, UART_PIOSC_FREQUENCY);
 }

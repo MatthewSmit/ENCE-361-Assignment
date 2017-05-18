@@ -23,104 +23,92 @@
 #include "serialInterface.h"
 #include "pwmOutput.h"
 
-#define DEBUG
-
-#define SYSTICK_FREQUENCY   1000
-#define SYSTICK_PERIOD_MS   1
+#define SYSTICK_FREQUENCY   200
+#define SYSTICK_PERIOD_MS   5
 
 struct Task {
-    /* Task Period (ms) */
     uint32_t period;
-    uint32_t elapsed_time;
+    uint32_t elapsed_ticks;
     void (*TaskCallback)(void);
 };
 
 static const uint8_t num_tasks = 2;
 static struct Task tasks[2];
 
-static volatile uint64_t sys_clock = 0;
+static volatile uint64_t scheduler_ticks;
 
 void Initialise();
-void InitialiseSysTick();
+void SysTickInit();
 void SysTickHandler();
 void Draw();
 void RegisterTasks();
+void UpdateSerial();
 
 void Initialise() {
     SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
 
-    InitialiseSysTick();
-    InitialisePwm();
-    InitialiseButtons();
-    InitialiseSerial();
-    InitialiseOled();
-    InitialiseYawManager();
-    InitialiseHeightMonitor();
+    SysTickInit();
+    PwmInit();
+    ButtonsInit();
+    YawManagerInit();
+    HeightManagerInit();
 
-    IntMasterEnable();
+    OledInit();
+    SerialInit();
 }
 
-void InitialiseSysTick() {
-	uint32_t systick_period = SysCtlClockGet() / SYSTICK_FREQUENCY;
-    SysTickPeriodSet(systick_period);
+void SysTickInit() {
+    SysTickPeriodSet(SysCtlClockGet() / SYSTICK_FREQUENCY);
     SysTickIntRegister(SysTickHandler);
     SysTickIntEnable();
     SysTickEnable();
 }
 
 void SysTickHandler() {
-    sys_clock++;
+    scheduler_ticks++;
     for (uint8_t i = 0; i < num_tasks; i++) {
-        if (tasks[i].elapsed_time >= tasks[i].period) {
+        if (tasks[i].elapsed_ticks >= tasks[i].period) {
+            tasks[i].elapsed_ticks = 0;
             tasks[i].TaskCallback();
-            tasks[i].elapsed_time = 0;
         }
-        tasks[i].elapsed_time += SYSTICK_PERIOD_MS;
+        tasks[i].elapsed_ticks++;
     }
 }
 
 void RegisterTasks() {
     uint8_t i = 0;
-    tasks[i].period = 5;
-    tasks[i].elapsed_time = tasks[i].period;
-    tasks[i].TaskCallback = UpdateButtons;
-    i++;
-    tasks[i].period = 5;
-    tasks[i].elapsed_time = tasks[i].period;
+    tasks[i].period = 1;
+    tasks[i].elapsed_ticks = tasks[i].period;
     tasks[i].TaskCallback = UpdateHeight;
-//    i++;
-//    tasks[i].period = 50;
-//    tasks[i].elapsed_time = tasks[i].period;
-//    tasks[i].TaskCallback = Draw;
+    i++;
+    tasks[i].period = 1;
+    tasks[i].elapsed_ticks = tasks[i].period;
+    tasks[i].TaskCallback = UpdateButtons;
 }
 
 void Draw() {
     char text_buffer[17];
-    usnprintf(text_buffer, sizeof(text_buffer), "Hello World%d", 1);
+    usnprintf(text_buffer, sizeof(text_buffer), "Ticks");
+    OledStringDraw(text_buffer, 0, 0);
+    usnprintf(text_buffer, sizeof(text_buffer), "%d", (uint32_t) scheduler_ticks);
     OledStringDraw(text_buffer, 0, 1);
-//    static uint8_t max_pushes = 0;
-//    static uint64_t tmp_clock = 0;
-//    uint32_t period = sys_clock - tmp_clock;
-//    tmp_clock = sys_clock;
-//    uint8_t tmp_pushes = NumPushes(BTN_DOWN);
-//    if (tmp_pushes > max_pushes) {
-//        max_pushes = tmp_pushes;
-//    }
-//
-//    char text_buffer[17];
-//    uvsnprintf(text_buffer, "Btn presses %2d", max_pushes);
-//    OledStringDraw(text_buffer, 0, 1);
-//    usprintf(text_buffer, "FPS: %3d  ", period * SYSTICK_PERIOD_MS);
-//    OledStringDraw(text_buffer, 0, 2);
-//    SysCtlDelay(SysCtlClockGet() / (3 * 30));
-//    SysCtlSleep();
+}
+
+void UpdateSerial() {
+    UARTprintf("Height: %d\n", GetHeight());
+    UARTprintf("Height %%: %d\n", GetHeightPercentage());
 }
 
 int main() {
     RegisterTasks();
     Initialise();
+    IntMasterEnable();
 
 	while (1) {
-	    Draw();
+	    if (scheduler_ticks % 10 == 0)
+	        Draw();
+	    if (scheduler_ticks % 50 == 0)
+	        UpdateSerial();
+	    SysCtlSleep();
 	}
 }

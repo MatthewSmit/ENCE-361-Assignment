@@ -8,6 +8,6 @@
 int32_t GetHeight();
 int32_t GetHeightPercentage();
 void UpdateHeight();
-void InitialiseHeightMonitor();
+void HeightManagerInit();
 
 #endif /* HEIGHT_MANAGER_H_ */

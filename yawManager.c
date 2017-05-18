@@ -31,7 +31,7 @@ void YawHandler() {
     yaw += lookup_table[state | (previous_state << 2)];
 }
 
-void InitialiseYawManager() {
+void YawManagerInit() {
     SysCtlPeripheralEnable(YAW_PERIPH_GPIO);
 
     GPIOPinTypeGPIOInput(YAW_PERIPH_BASE, YAW_GPIO_PINS);

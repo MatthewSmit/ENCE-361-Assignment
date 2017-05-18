@@ -48,7 +48,7 @@ static bool current_state[NUM_BUTTONS];
 static uint16_t count[NUM_BUTTONS];
 static uint8_t pushes[NUM_BUTTONS];
 
-void InitialiseButtons () {
+void ButtonsInit() {
     /* UP and DOWN buttons are active high (default low) so are configured as pull down. */
     SysCtlPeripheralEnable (BTN_UP_PERIPH);
     GPIOPinTypeGPIOInput (BTN_UP_BASE, BTN_UP_PIN);
@@ -89,8 +89,7 @@ void InitialiseButtons () {
     }
 }
 
-void UpdateButtons (void)
-{
+void UpdateButtons() {
     bool current_value[NUM_BUTTONS];
     current_value[BTN_UP] = GPIOPinRead (BTN_UP_BASE, BTN_UP_PIN);
     current_value[BTN_DOWN] = GPIOPinRead (BTN_DOWN_BASE, BTN_DOWN_PIN);
@@ -114,9 +113,11 @@ void UpdateButtons (void)
 }
 
 uint8_t NumPushes(uint8_t button_name) {
-	uint8_t tmp_pushes = pushes[button_name];
 	bool was_disabled = IntMasterDisable();
+
+	uint8_t tmp_pushes = pushes[button_name];
 	pushes[button_name] = 0;
+
 	if (!was_disabled)
 		IntMasterEnable();
 	return tmp_pushes;

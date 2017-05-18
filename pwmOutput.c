@@ -41,7 +41,7 @@
 #define PWM_DIVIDER_CODE        SYSCTL_PWMDIV_16
 #define PWM_DIVIDER             16
 
-void InitialisePwm() {
+void PwmInit() {
     SysCtlPWMClockSet(PWM_DIVIDER_CODE);
 
     uint32_t period = SysCtlClockGet() / PWM_DIVIDER / PWM_FREQUENCY;
