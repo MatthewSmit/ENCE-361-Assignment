@@ -6,8 +6,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
-
 #include "driverlib/adc.h"
+#include "driverlib/debug.h"
 #include "driverlib/gpio.h"
 #include "driverlib/interrupt.h"
 #include "driverlib/sysctl.h"
@@ -15,7 +15,7 @@
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
 #include "utils/ustdlib.h"
-
+#include "utils/scheduler.h"
 #include "buttons.h"
 #include "heightManager.h"
 #include "yawManager.h"
@@ -24,30 +24,28 @@
 #include "pwmOutput.h"
 
 #define SYSTICK_FREQUENCY   200
-#define SYSTICK_PERIOD_MS   5
 
-struct Task {
-    uint32_t period;
-    uint32_t elapsed_ticks;
-    void (*TaskCallback)(void);
-};
-
-static const uint8_t num_tasks = 2;
-static struct Task tasks[2];
-
-static volatile uint64_t scheduler_ticks;
+tSchedulerTask g_psSchedulerTable[3];
+uint32_t g_ui32SchedulerNumTasks = 3;
 
 void Initialise();
-void SysTickInit();
-void SysTickHandler();
 void Draw();
 void RegisterTasks();
 void UpdateSerial();
 
+#ifdef DEBUG
+void __error__(char *pcFilename, uint32_t ui32Line) {
+    while (1) {
+    }
+}
+#endif
+
 void Initialise() {
     SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
 
-    SysTickInit();
+    SchedulerInit(SYSTICK_FREQUENCY);
+    SysTickIntRegister(SchedulerSysTickIntHandler);
+
     PwmInit();
     ButtonsInit();
     YawManagerInit();
@@ -57,58 +55,46 @@ void Initialise() {
     SerialInit();
 }
 
-void SysTickInit() {
-    SysTickPeriodSet(SysCtlClockGet() / SYSTICK_FREQUENCY);
-    SysTickIntRegister(SysTickHandler);
-    SysTickIntEnable();
-    SysTickEnable();
-}
-
-void SysTickHandler() {
-    scheduler_ticks++;
-    for (uint8_t i = 0; i < num_tasks; i++) {
-        if (tasks[i].elapsed_ticks >= tasks[i].period) {
-            tasks[i].elapsed_ticks = 0;
-            tasks[i].TaskCallback();
-        }
-        tasks[i].elapsed_ticks++;
-    }
-}
-
 void RegisterTasks() {
-    uint8_t i = 0;
-    tasks[i].period = 1;
-    tasks[i].elapsed_ticks = tasks[i].period;
-    tasks[i].TaskCallback = UpdateHeight;
-    i++;
-    tasks[i].period = 1;
-    tasks[i].elapsed_ticks = tasks[i].period;
-    tasks[i].TaskCallback = UpdateButtons;
+    tSchedulerTask *task_ptr = g_psSchedulerTable;
+    task_ptr->bActive = true;
+    task_ptr->pfnFunction = UpdateSerial;
+    task_ptr->ui32FrequencyTicks = 0;
+
+    task_ptr++;
+    task_ptr->bActive = true;
+    task_ptr->pfnFunction = Draw;
+    task_ptr->ui32FrequencyTicks = 10;
+
+    task_ptr++;
+    task_ptr->bActive = true;
+    task_ptr->pfnFunction = UpdateSerial;
+    task_ptr->ui32FrequencyTicks = 50;
 }
 
 void Draw() {
     char text_buffer[17];
     usnprintf(text_buffer, sizeof(text_buffer), "Ticks");
     OledStringDraw(text_buffer, 0, 0);
-    usnprintf(text_buffer, sizeof(text_buffer), "%d", (uint32_t) scheduler_ticks);
+    usnprintf(text_buffer, sizeof(text_buffer), "%d", SchedulerTickCountGet());
     OledStringDraw(text_buffer, 0, 1);
 }
 
 void UpdateSerial() {
     UARTprintf("Height: %d\n", GetHeight());
     UARTprintf("Height %%: %d\n", GetHeightPercentage());
+#ifdef DEBUG
+    UARTprintf("Debug only");
+#endif
 }
 
 int main() {
-    RegisterTasks();
     Initialise();
+    RegisterTasks();
+
     IntMasterEnable();
 
 	while (1) {
-	    if (scheduler_ticks % 10 == 0)
-	        Draw();
-	    if (scheduler_ticks % 50 == 0)
-	        UpdateSerial();
-	    SysCtlSleep();
+	    SchedulerRun();
 	}
 }

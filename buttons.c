@@ -96,8 +96,7 @@ void UpdateButtons() {
     current_value[BTN_LEFT] = GPIOPinRead (BTN_LEFT_BASE, BTN_LEFT_PIN);
     current_value[BTN_RIGHT] = GPIOPinRead (BTN_RIGHT_BASE, BTN_RIGHT_PIN);
 
-    for (uint8_t i = 0; i < NUM_BUTTONS; i++)
-    {
+    for (uint8_t i = 0; i < NUM_BUTTONS; i++) {
         if (current_value[i] != current_state[i]) {
             count[i]++;
             if  (count[i] >= NUM_POLLS)
