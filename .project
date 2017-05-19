@@ -26,11 +26,6 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>cpu_usage.c</name>
-			<type>1</type>
-			<locationURI>TIVAWARE_DIR/utils/cpu_usage.c</locationURI>
-		</link>
-		<link>
 			<name>ringbuf.c</name>
 			<type>1</type>
 			<locationURI>TIVAWARE_DIR/utils/ringbuf.c</locationURI>
