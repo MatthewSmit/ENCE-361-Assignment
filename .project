@@ -51,10 +51,4 @@
 			<locationURI>TIVAWARE_DIR/utils/ustdlib.c</locationURI>
 		</link>
 	</linkedResources>
-	<variableList>
-		<variable>
-			<name>TIVAWARE_DIR</name>
-			<value>file:/home/daniel/ti/SW-TM4C-2.1.4.178</value>
-		</variable>
-	</variableList>
 </projectDescription>
