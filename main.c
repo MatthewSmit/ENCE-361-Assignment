@@ -2,11 +2,10 @@
  * Main Program
  */
 
-#include "config.h"
-
-#include <math.h>
 #include <stdio.h>
-#include <string.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdbool.h>
 
 #include "driverlib/adc.h"
 #include "driverlib/gpio.h"
@@ -18,129 +17,98 @@
 #include "utils/ustdlib.h"
 
 #include "buttons.h"
-#include "OrbitOledInterface.h"
+#include "heightManager.h"
 #include "yawManager.h"
+#include "orbitOledInterface.h"
 #include "serialInterface.h"
-#include "heightMonitor.h"
 #include "pwmOutput.h"
 
-#define DEBUG
+#define SYSTICK_FREQUENCY   200
+#define SYSTICK_PERIOD_MS   5
 
-#define PIN_BUFFER_SIZE 10
+struct Task {
+    uint32_t period;
+    uint32_t elapsed_ticks;
+    void (*TaskCallback)(void);
+};
 
-// Range the SysTick timer counts in
-static uint32_t sysTickRange = 0;
+static const uint8_t num_tasks = 2;
+static struct Task tasks[2];
 
-// Current MS count
-static volatile uint32_t timeCount = 0;
+static volatile uint64_t scheduler_ticks;
 
-// Last read MS time for pin changes
-static volatile uint32_t pinChangeLastMS = 0;
-
-// Current ticks in read representing pin changes
-static volatile uint32_t pinTicks[PIN_BUFFER_SIZE] = {};
-static volatile uint32_t pinTickPtr = 0;
-
+void Initialise();
+void SysTickInit();
 void SysTickHandler();
-void PinChangeHandler();
+void Draw();
+void RegisterTasks();
+void UpdateSerial();
 
-void InitialiseClock() {
-	// Sets the clock to 80 MHz
+void Initialise() {
     SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
+
+    SysTickInit();
+    PwmInit();
+    ButtonsInit();
+    YawManagerInit();
+    HeightManagerInit();
+
+    OledInit();
+    SerialInit();
 }
 
-void InitialiseSysTick() {
-	// Sets the SysTick range to 1ms
-	sysTickRange = SysCtlClockGet() / 1000;
-    SysTickPeriodSet(sysTickRange);
+void SysTickInit() {
+    SysTickPeriodSet(SysCtlClockGet() / SYSTICK_FREQUENCY);
     SysTickIntRegister(SysTickHandler);
     SysTickIntEnable();
     SysTickEnable();
 }
 
 void SysTickHandler() {
-    timeCount++;
-
-    updateHeight(); //triggers a height reading
+    scheduler_ticks++;
+    for (uint8_t i = 0; i < num_tasks; i++) {
+        if (tasks[i].elapsed_ticks >= tasks[i].period) {
+            tasks[i].elapsed_ticks = 0;
+            tasks[i].TaskCallback();
+        }
+        tasks[i].elapsed_ticks++;
+    }
 }
 
-void Draw(uint32_t dutyCycle) {
-    OLEDStringDraw("Milestone 1", 0, 0);
-
-    char stringBuffer[30];
-    memset(stringBuffer, 0, sizeof(stringBuffer));
-
-    float yaw = getYawDegrees();
-    sprintf(stringBuffer, "Yaw: %d  ", (int)yaw);
-    OLEDStringDraw(stringBuffer, 0, 1);
-    memset(stringBuffer, 0, sizeof(stringBuffer));
-
-    uint32_t height = getHeightPercentage();
-    sprintf(stringBuffer, "Height: %d  ", height);
-    OLEDStringDraw(stringBuffer, 0, 2);
-    memset(stringBuffer, 0, sizeof(stringBuffer));
-
-    //sprintf(stringBuffer, "Freq: %d Hz  ", frequency);
-    //OLEDStringDraw(stringBuffer, 0, 2);
-    //memset(stringBuffer, 0, sizeof(stringBuffer));
-
-    sprintf(stringBuffer, "Duty Cycle: %d%% ", dutyCycle);
-    OLEDStringDraw(stringBuffer, 0, 3);
+void RegisterTasks() {
+    uint8_t i = 0;
+    tasks[i].period = 1;
+    tasks[i].elapsed_ticks = tasks[i].period;
+    tasks[i].TaskCallback = UpdateHeight;
+    i++;
+    tasks[i].period = 1;
+    tasks[i].elapsed_ticks = tasks[i].period;
+    tasks[i].TaskCallback = UpdateButtons;
 }
 
-static bool lastButtonState[NUM_BUTTONS] = {};
-
-bool IsButtonPressed(int button) {
-    if (button < 0 || button >= NUM_BUTTONS)
-        return false;
-
-    return !lastButtonState[button] && checkButton(button);
+void Draw() {
+    char text_buffer[17];
+    usnprintf(text_buffer, sizeof(text_buffer), "Ticks");
+    OledStringDraw(text_buffer, 0, 0);
+    usnprintf(text_buffer, sizeof(text_buffer), "%d", (uint32_t) scheduler_ticks);
+    OledStringDraw(text_buffer, 0, 1);
 }
 
-void ButtonStateUpdate() {
-    for (int i = 0; i < NUM_BUTTONS; i++)
-        lastButtonState[i] = checkButton(i);
+void UpdateSerial() {
+    UARTprintf("Height: %d\n", GetHeight());
+    UARTprintf("Height %%: %d\n", GetHeightPercentage());
 }
 
-int main(void) {
-    InitialiseClock();
-    init_pwm();
-    //InitialisePin();
-
-    initButtons();
-    initSerial();
-    initOLED();
-    initYawManager();
-    initHeightMonitor();
-
-//    EnablePWM();
-
+int main() {
+    RegisterTasks();
+    Initialise();
     IntMasterEnable();
 
-//    uint32_t frequency = PWM_START_RATE_HZ;
-    uint32_t dutyCycle = 5;
-	while (true) {
-
-        if (IsButtonPressed(BUT_DOWN))
-        {
-            dutyCycle -= 5;
-            if (dutyCycle < 5)
-                dutyCycle = 5;
-
-            pwm_duty_cycle_set(MAIN_ROTOR, dutyCycle);
-        }
-
-        if (IsButtonPressed(BUT_UP))
-        {
-            dutyCycle += 5;
-            if (dutyCycle > 95)
-                dutyCycle = 95;
-
-            pwm_duty_cycle_set(MAIN_ROTOR, dutyCycle);
-        }
-
-		ButtonStateUpdate();
-
-		Draw(dutyCycle);
+	while (1) {
+	    if (scheduler_ticks % 10 == 0)
+	        Draw();
+	    if (scheduler_ticks % 50 == 0)
+	        UpdateSerial();
+	    SysCtlSleep();
 	}
 }

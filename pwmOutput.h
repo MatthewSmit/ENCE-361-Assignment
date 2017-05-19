@@ -10,11 +10,11 @@
 
 #define PWM_FREQUENCY 200
 
-enum pwm_outputs {MAIN_ROTOR, TAIL_ROTOR};
+enum {MAIN_ROTOR, TAIL_ROTOR};
 
-void init_pwm(void);
-void pwm_duty_cycle_set(uint8_t pwm_output, uint32_t duty_cycle);
-void pwm_enable(uint8_t pwm_output);
-void pwm_disable(uint8_t pwm_output);
+void PwmInit();
+void SetPwmDutyCycle(uint8_t pwm_output, uint32_t duty_cycle);
+void PwmDisable(uint8_t pwm_output);
+void PwmEnable(uint8_t pwm_output);
 
 #endif
