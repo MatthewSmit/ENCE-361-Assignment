@@ -5,11 +5,11 @@
  *      Author: daniel
  */
 
-#ifndef SERIALINTERFACE_H_
-#define SERIALINTERFACE_H_
+#ifndef SERIAL_INTERFACE_H_
+#define SERIAL_INTERFACE_H_
 
 #define BAUD_RATE 9600
 
 void SerialInit();
 
-#endif /* SERIALINTERFACE_H_ */
+#endif /* SERIAL_INTERFACE_H_ */
