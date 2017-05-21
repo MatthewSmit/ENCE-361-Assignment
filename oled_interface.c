@@ -11,7 +11,7 @@
 #include "libOrbitOled/OrbitOledChar.h"
 #include "libOrbitOled/OrbitOledGrph.h"
 
-#include "orbitOledInterface.h"
+#include "oled_interface.h"
 
 void OledStringDraw(char *string_ptr, uint32_t x_char, uint32_t y_char) {
     OrbitOledSetCursor(x_char, y_char);
@@ -19,14 +19,12 @@ void OledStringDraw(char *string_ptr, uint32_t x_char, uint32_t y_char) {
 }
 
 void OledInit() {
-	/*
-	 * Initialize the OLED display
-	 */
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);    //Need signals on GPIOD
-	SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);    //Need signals on GPIOE
+    /*
+     * Initialize the OLED display
+     */
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD);    //Need signals on GPIOD
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);    //Need signals on GPIOE
 
-	OrbitOledInit();
+    OrbitOledInit();
 }
-
-
 

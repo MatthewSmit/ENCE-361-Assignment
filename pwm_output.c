@@ -9,12 +9,13 @@
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
 
+#include "driverlib/debug.h"
 #include "driverlib/gpio.h"
 #include "driverlib/pin_map.h"
 #include "driverlib/pwm.h"
 #include "driverlib/sysctl.h"
 
-#include "pwmOutput.h"
+#include "pwm_output.h"
 
 /* PWM Main Rotor Definitions */
 #define PWM_MAIN_BASE           PWM0_BASE
@@ -41,6 +42,8 @@
 #define PWM_DIVIDER_CODE        SYSCTL_PWMDIV_16
 #define PWM_DIVIDER             16
 
+void SetPwmRange(uint32_t min, uint32_t max);
+
 void PwmInit() {
     SysCtlPWMClockSet(PWM_DIVIDER_CODE);
 
@@ -53,11 +56,12 @@ void PwmInit() {
     GPIOPinConfigure(PWM_MAIN_GPIO_CONFIG);
     GPIOPinTypePWM(PWM_MAIN_GPIO_BASE, PWM_MAIN_GPIO_PIN);
 
+    PwmDisable(MAIN_ROTOR);
+
     PWMGenConfigure(PWM_MAIN_BASE, PWM_MAIN_GEN, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
     PWMGenEnable(PWM_MAIN_BASE, PWM_MAIN_GEN);
 
     PWMGenPeriodSet(PWM_MAIN_BASE, PWM_MAIN_GEN, period);
-    PwmDisable(MAIN_ROTOR);
 
     /* Initialise Tail Rotor */
     SysCtlPeripheralEnable(PWM_TAIL_PERIPH_GPIO);
@@ -66,21 +70,25 @@ void PwmInit() {
     GPIOPinConfigure(PWM_TAIL_GPIO_CONFIG);
     GPIOPinTypePWM(PWM_TAIL_GPIO_BASE, PWM_TAIL_GPIO_PIN);
 
+    PwmDisable(TAIL_ROTOR);
+
     PWMGenConfigure(PWM_TAIL_BASE, PWM_TAIL_GEN, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
     PWMGenEnable(PWM_TAIL_BASE, PWM_TAIL_GEN);
 
     PWMGenPeriodSet(PWM_TAIL_BASE, PWM_TAIL_GEN, period);
-    PwmDisable(TAIL_ROTOR);
 }
 
 void SetPwmDutyCycle(uint8_t pwm_output, uint32_t duty_cycle) {
+	ASSERT(!(duty_cycle < 2 || duty_cycle > 98));
 	uint32_t period = SysCtlClockGet() / PWM_DIVIDER / PWM_FREQUENCY;
 	switch (pwm_output) {
 	case MAIN_ROTOR:
-		PWMPulseWidthSet(PWM_MAIN_BASE, PWM_MAIN_OUTNUM, period * duty_cycle / 100);
+		PWMPulseWidthSet(PWM_MAIN_BASE, PWM_MAIN_OUTNUM,
+				period * duty_cycle / 100);
 		break;
 	case TAIL_ROTOR:
-		PWMPulseWidthSet(PWM_TAIL_BASE, PWM_TAIL_OUTNUM, period * duty_cycle / 100);
+		PWMPulseWidthSet(PWM_TAIL_BASE, PWM_TAIL_OUTNUM,
+				period * duty_cycle / 100);
 		break;
 	}
 }

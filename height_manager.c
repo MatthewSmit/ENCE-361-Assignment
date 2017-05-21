@@ -51,6 +51,7 @@ void HeightManagerInit() {
     ADCProcessorTrigger(ADC_BASE, ADC_SEQUENCE);
     while (!ADCIntStatus(ADC_BASE, ADC_SEQUENCE, false));
     ADCSequenceDataGet(ADC_BASE, ADC_SEQUENCE, &zero_reading);
+    adc_val = zero_reading;
 
     ADCIntClear(ADC_BASE, ADC_SEQUENCE);
     ADCIntEnable(ADC_BASE, ADC_SEQUENCE);

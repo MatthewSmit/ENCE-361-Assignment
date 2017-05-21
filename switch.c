@@ -12,7 +12,6 @@
 #include "driverlib/gpio.h"
 #include "driverlib/sysctl.h"
 
-#include "buttons.h"
 #include "switch.h"
 
 /* UP Button */

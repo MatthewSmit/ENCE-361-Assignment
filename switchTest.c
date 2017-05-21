@@ -13,7 +13,7 @@
 #include "driverlib/systick.h"
 #include "utils/ustdlib.h"
 
-#include "orbitOledInterface.h"
+#include "oled_interface.h"
 #include "switch.h"
 
 #define SYSTICK_FREQUENCY   200

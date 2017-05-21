@@ -23,7 +23,7 @@
 #define YAW_REF_INT             INT_GPIOC
 
 static int32_t yaw;
-static int32_t reference_yaw = -1;
+static bool ref_found = false;
 
 static const int8_t lookup_table[] = {0, -1, 1, 0, 1, 0, 0, -1, -1, 0, 0, 1, 0, 1, -1, 0};
 
@@ -38,8 +38,8 @@ static void YawHandler() {
 }
 
 static void YawRefHandler() {
-    // Positive only Modulus, so will reference_yaw will be between [0, YAW_FULL_ROTATION)
-    reference_yaw = (yaw % YAW_FULL_ROTATION + YAW_FULL_ROTATION) % YAW_FULL_ROTATION;
+    yaw = 0;
+    ref_found = true;
     IntDisable(YAW_REF_INT);
     GPIOIntClear(YAW_REF_BASE, YAW_REF_PIN);
 }
@@ -62,7 +62,14 @@ void YawManagerInit() {
     GPIOIntTypeSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_RISING_EDGE);
     GPIOIntRegister(YAW_REF_BASE, YawRefHandler);
     GPIOIntEnable(YAW_REF_BASE, YAW_REF_PIN);
+}
+
+void YawRefTrigger() {
     IntEnable(YAW_REF_INT);
+}
+
+bool YawRefFound() {
+    return ref_found;
 }
 
 int32_t GetYaw() {

@@ -8,6 +8,9 @@
 #ifndef SWITCH_H_
 #define SWITCH_H_
 
+/* State changes only after so many consecutive readings have an opposite value */
+#define NUM_POLLS 5
+
 enum {DOWN, UP};
 
 /**

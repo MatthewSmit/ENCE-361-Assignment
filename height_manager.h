@@ -5,8 +5,8 @@
 #ifndef HEIGHT_MANAGER_H_
 #define HEIGHT_MANAGER_H_
 
-int32_t GetHeight();
-int32_t GetHeightPercentage();
+int32_t GetHeight(void);
+int32_t GetHeightPercentage(void);
 void UpdateHeight();
 void HeightManagerInit();
 
