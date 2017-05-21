@@ -50,9 +50,7 @@ void __error__(char *pcFilename, uint32_t ui32Line) {
 #endif
 
 void Initialise() {
-    SysCtlClockSet(
-            SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN
-                    | SYSCTL_XTAL_16MHZ);
+    SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN| SYSCTL_XTAL_16MHZ);
 
     FPULazyStackingEnable();
 
@@ -79,15 +77,15 @@ void RegisterTasks() {
     task_ptr->pfnFunction = DemoButtons;
     task_ptr->ui32FrequencyTicks = 50;
 
-//    task_ptr++;
-//    task_ptr->bActive = true;
-//    task_ptr->pfnFunction = Draw;
-//    task_ptr->ui32FrequencyTicks = 10;
-
     task_ptr++;
     task_ptr->bActive = true;
-    task_ptr->pfnFunction = UpdateSerial;
-    task_ptr->ui32FrequencyTicks = 20;
+    task_ptr->pfnFunction = Draw;
+    task_ptr->ui32FrequencyTicks = 10;
+
+//    task_ptr++;
+//    task_ptr->bActive = true;
+//    task_ptr->pfnFunction = UpdateSerial;
+//    task_ptr->ui32FrequencyTicks = 20;
 }
 
 void Draw() {
@@ -176,7 +174,7 @@ int main() {
     RegisterTasks();
 
 #ifdef DEBUG
-    SysCtlDelay(SysCtlClockGet());
+//    SysCtlDelay(SysCtlClockGet());
 
     SetTargetHeight(20);
     TimerInit();

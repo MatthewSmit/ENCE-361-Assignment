@@ -10,10 +10,6 @@
 #include "yaw_manager.h"
 #include "yaw_controller.h"
 
-//static double k_p = 5.0 * 0.45;
-//static double k_i = 0.5 / 1.2 / 1000;
-//static double k_d = 0.0;
-
 static double proportional_gain = 2.0;
 static double integral_gain = 0.0;
 static double derivative_gain = 0.0;

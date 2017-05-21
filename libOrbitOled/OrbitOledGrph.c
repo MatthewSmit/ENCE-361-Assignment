@@ -612,7 +612,7 @@ OrbitOledGetBmp(int dxco, int dyco, char * pbBits)
 	int		xcoCur;
 	int		bnAlign;
 	char	mskEnd;
-	char	bTmp;
+//	char	bTmp;
 
 	/* Set up the four sides of the source rectangle.
 	*/
@@ -658,8 +658,8 @@ OrbitOledGetBmp(int dxco, int dyco, char * pbBits)
 		}
 		else {
 			while (xcoCur < xcoRight) {
-				bTmp = *pbDspCur;
-				bTmp = *(pbDspCur+ccolOledMax);
+//				bTmp = *pbDspCur;
+//				bTmp = *(pbDspCur+ccolOledMax);
 				*pbBmpCur = ((*pbDspCur >> bnAlign) |
 							((*(pbDspCur+ccolOledMax)) << (8-bnAlign))) & mskEnd;
 				xcoCur += 1;
@@ -815,7 +815,7 @@ void
 OrbitOledDrawChar(char ch)
 	{
 	char *	pbFont;
-	char *	pbBmp;
+//	char *	pbBmp;
 
 	if ((ch & 0x80) != 0) {
 		return;
@@ -828,7 +828,7 @@ OrbitOledDrawChar(char ch)
 		pbFont = pbOledFontCur + (ch-chOledUserMax) * cbOledChar;
 	}
 
-	pbBmp = pbOledCur;
+//	pbBmp = pbOledCur;
 
 	OrbitOledPutBmp(dxcoOledFontCur, dycoOledFontCur, pbFont);
 
