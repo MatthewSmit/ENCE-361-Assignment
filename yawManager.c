@@ -17,11 +17,17 @@
 #define YAW_GPIO_PINS       (YAW_CHANNEL_A | YAW_CHANNEL_B)
 #define YAW_INT             INT_GPIOB
 
+#define YAW_REF_PERIPH          SYSCTL_PERIPH_GPIOC
+#define YAW_REF_BASE            GPIO_PORTC_BASE
+#define YAW_REF_PIN             GPIO_PIN_4
+#define YAW_REF_INT             INT_GPIOC
+
 static int32_t yaw;
+static int32_t reference_yaw = -1;
 
 static const int8_t lookup_table[] = {0, -1, 1, 0, 1, 0, 0, -1, -1, 0, 0, 1, 0, 1, -1, 0};
 
-void YawHandler() {
+static void YawHandler() {
     static uint8_t state = 0;
     uint8_t previous_state = state;
     state = (uint8_t) GPIOPinRead(YAW_PERIPH_BASE, YAW_GPIO_PINS);
@@ -29,6 +35,13 @@ void YawHandler() {
     GPIOIntClear(YAW_PERIPH_BASE, YAW_GPIO_PINS);
 
     yaw += lookup_table[state | (previous_state << 2)];
+}
+
+static void YawRefHandler() {
+    // Positive only Modulus, so will reference_yaw will be between [0, YAW_FULL_ROTATION)
+    reference_yaw = (yaw % YAW_FULL_ROTATION + YAW_FULL_ROTATION) % YAW_FULL_ROTATION;
+    IntDisable(YAW_REF_INT);
+    GPIOIntClear(YAW_REF_BASE, YAW_REF_PIN);
 }
 
 void YawManagerInit() {
@@ -41,6 +54,15 @@ void YawManagerInit() {
     GPIOIntRegister(YAW_PERIPH_BASE, YawHandler);
     GPIOIntEnable(YAW_PERIPH_BASE, YAW_GPIO_PINS);
     IntEnable(YAW_INT);
+
+    SysCtlPeripheralEnable(YAW_REF_PERIPH);
+    GPIOPinTypeGPIOInput(YAW_REF_BASE, YAW_REF_PIN);
+    GPIOPadConfigSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPD);
+    GPIODirModeSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_DIR_MODE_IN);
+    GPIOIntTypeSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_RISING_EDGE);
+    GPIOIntRegister(YAW_REF_BASE, YawRefHandler);
+    GPIOIntEnable(YAW_REF_BASE, YAW_REF_PIN);
+    IntEnable(YAW_REF_INT);
 }
 
 int32_t GetYaw() {
