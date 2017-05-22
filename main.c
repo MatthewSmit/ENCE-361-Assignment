@@ -23,13 +23,13 @@
 #include "utils/scheduler.h"
 
 #include "buttons.h"
-#include "height_manager.h"
 #include "height_controller.h"
 #include "oled_interface.h"
 #include "serial_interface.h"
 #include "yaw_controller.h"
-#include "yaw_manager.h"
 #include "flight_controller.h"
+#include "height.h"
+#include "yaw.h"
 
 #define SYSTICK_FREQUENCY   200
 
@@ -50,8 +50,16 @@ void __error__(char *pcFilename, uint32_t ui32Line) {
 #endif
 
 void Initialise() {
+    /*
+     * Set the clock to 80 MHz.
+     */
     SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN| SYSCTL_XTAL_16MHZ);
 
+    //
+    // Enable lazy stacking for interrupt handlers.  This allows floating-point
+    // instructions to be used within interrupt handlers, but at the expense of
+    // extra stack usage.
+    //
     FPULazyStackingEnable();
 
     SchedulerInit(SYSTICK_FREQUENCY);

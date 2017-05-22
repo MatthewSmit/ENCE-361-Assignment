@@ -6,7 +6,7 @@
 #ifndef HEIGHT_CONTROLLER_H_
 #define HEIGHT_CONTROLLER_H_
 
-#include "height_manager.h"
+#include "height.h"
 #include "pwm_output.h"
 #include "pid.h"
 

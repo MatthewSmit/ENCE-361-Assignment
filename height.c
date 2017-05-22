@@ -41,16 +41,18 @@ void HeightManagerInit() {
 
     /* Set to manual trigger so we can get a zero height reading. */
     ADCSequenceConfigure(ADC_BASE, ADC_SEQUENCE, ADC_TRIGGER_PROCESSOR, 0);
-    ADCSequenceStepConfigure(ADC_BASE, ADC_SEQUENCE, 0, ADC_CHANNEL | ADC_CTL_IE | ADC_CTL_END);
-    ADCSequenceEnable(ADC_BASE, ADC_SEQUENCE);
-
+    ADCSequenceStepConfigure(ADC_BASE, ADC_SEQUENCE, 0,
+            ADC_CHANNEL | ADC_CTL_IE | ADC_CTL_END);
     ADCHardwareOversampleConfigure(ADC_BASE, 64);
+
+    ADCSequenceEnable(ADC_BASE, ADC_SEQUENCE);
 
     ADCIntRegister(ADC_BASE, ADC_SEQUENCE, AdcHandler);
     ADCIntClear(ADC_BASE, ADC_SEQUENCE);
 
     ADCProcessorTrigger(ADC_BASE, ADC_SEQUENCE);
-    while (!ADCIntStatus(ADC_BASE, ADC_SEQUENCE, false));
+    while (!ADCIntStatus(ADC_BASE, ADC_SEQUENCE, false)) {
+    }
     ADCSequenceDataGet(ADC_BASE, ADC_SEQUENCE, &zero_reading);
     adc_val = zero_reading;
 
@@ -58,7 +60,9 @@ void HeightManagerInit() {
     ADCIntEnable(ADC_BASE, ADC_SEQUENCE);
 
     /* Set to timer trigger for periodic height reading. */
+    ADCSequenceDisable(ADC_BASE, ADC_SEQUENCE);
     ADCSequenceConfigure(ADC_BASE, ADC_SEQUENCE, ADC_TRIGGER_TIMER, 0);
+    ADCSequenceEnable(ADC_BASE, ADC_SEQUENCE);
 }
 
 int32_t GetHeight() {

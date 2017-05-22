@@ -8,9 +8,9 @@
 #ifndef YAW_CONTROLLER_H_
 #define YAW_CONTROLLER_H_
 
-#include "yaw_manager.h"
 #include "pwm_output.h"
 #include "pid.h"
+#include "yaw.h"
 
 /*
  * Public function prototypes

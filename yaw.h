@@ -1,5 +1,5 @@
-#ifndef YAW_MANAGER_H_
-#define YAW_MANAGER_H_
+#ifndef YAW_H_
+#define YAW_H_
 
 void YawManagerInit(void);
 int32_t GetYaw(void);

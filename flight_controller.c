@@ -19,6 +19,7 @@
 #include "yaw_controller.h"
 #include "height_controller.h"
 #include "switch.h"
+#include "flight_controller.h"
 
 #define TIMER_PERIPH			SYSCTL_PERIPH_TIMER0
 #define TIMER_BASE				TIMER0_BASE
@@ -27,14 +28,12 @@
 #define TIMER_TIMEOUT			TIMER_TIMA_TIMEOUT
 #define TIMER_INT				INT_TIMER0A
 
-enum {LANDED, INIT, FLYING, LANDING};
-
 static uint8_t flight_state;
 
 void TimerHandler(void) {
     TimerIntClear(TIMER_BASE, TIMER_TIMEOUT);
-    UpdateYawController(1000 / PWM_FREQUENCY);
-    UpdateHeightController(1000 / PWM_FREQUENCY);
+//    UpdateYawController(1000 / PWM_FREQUENCY);
+//    UpdateHeightController(1000 / PWM_FREQUENCY);
 }
 
 void TimerInit(void) {
@@ -51,21 +50,22 @@ void TimerInit(void) {
     TimerIntEnable(TIMER_BASE, TIMER_TIMEOUT);
 
     /*
+     * Trigger ADC to capture height.
+     */
+    TimerADCEventSet(TIMER_BASE, TIMER_TIMEOUT);
+    TimerControlTrigger(TIMER_BASE, TIMER_TIMER, true);
+
+    /*
      * Enable the timers.
      */
     TimerEnable(TIMER_BASE, TIMER_TIMER);
-
-    /*
-     * Trigger ADC to capture height.
-     */
-    TimerADCEventSet(TIMER_BASE, TIMER_ADC_TIMEOUT_A);
 }
 
 void PriorityTaskInit(void) {
 	TimerInit();
 }
 
-void InitFlight(void) {
+void InitFlightController(void) {
 	flight_state = LANDED;
 	SysCtlDelay(SysCtlClockGet());
 
@@ -88,4 +88,8 @@ void UpdateFlightMode(void) {
 	case LANDING:
 		break;
 	}
+}
+
+uint8_t GetFlightMode(void) {
+    return flight_state;
 }

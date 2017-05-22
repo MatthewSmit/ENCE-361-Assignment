@@ -2,12 +2,12 @@
  * @file heighManager.h
  */
 
-#ifndef HEIGHT_MANAGER_H_
-#define HEIGHT_MANAGER_H_
+#ifndef HEIGHT_H_
+#define HEIGHT_H_
 
 int32_t GetHeight(void);
 int32_t GetHeightPercentage(void);
 void UpdateHeight();
 void HeightManagerInit();
 
-#endif /* HEIGHT_MANAGER_H_ */
+#endif /* HEIGHT_H_ */

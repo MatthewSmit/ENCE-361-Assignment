@@ -9,14 +9,10 @@
 #include "utils/uartstdio.h"
 #include "driverlib/debug.h"
 
-#include "height_manager.h"
 #include "height_controller.h"
+#include "height.h"
 
-//static double k_p = 5.0 * 0.45;
-//static double k_i = 0.5 / 1.2 / 1000;
-//static double k_d = 0.0;
-
-static double proportional_gain = 2.2 / 2;
+static double proportional_gain = 0.0;
 static double integral_gain = 0.0;
 static double derivative_gain = 0.0;
 

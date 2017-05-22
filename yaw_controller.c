@@ -7,8 +7,9 @@
 #include "utils/uartstdio.h"
 #include "driverlib/debug.h"
 
-#include "yaw_manager.h"
 #include "yaw_controller.h"
+
+#include "yaw.h"
 
 static double proportional_gain = 2.0;
 static double integral_gain = 0.0;
