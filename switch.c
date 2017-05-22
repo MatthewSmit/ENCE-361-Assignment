@@ -21,6 +21,7 @@
 #define SWITCH_DEFAULT          0
 
 static bool current_state;
+static bool event;
 static uint16_t count;
 
 void SwitchInit() {
@@ -29,7 +30,8 @@ void SwitchInit() {
     GPIOPinTypeGPIOInput(SWITCH_BASE, SWITCH_PIN);
     GPIOPadConfigSet(SWITCH_BASE, SWITCH_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPD);
 
-    current_state = SWITCH_DEFAULT;
+    current_state = GPIOPinRead(SWITCH_BASE, SWITCH_PIN);
+    event = DOWN;
     count = 0;
 }
 
@@ -42,12 +44,13 @@ void SwitchUpdate() {
         {
             count = 0; // Reset the count
             current_state = current_value;
+            event = current_value;
         }
     }
     else
         count = 0;
 }
 
-uint8_t GetSwitchState() {
-    return current_state;
+uint8_t GetSwitchEvent() {
+    return event;
 }

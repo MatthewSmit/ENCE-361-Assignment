@@ -39,6 +39,7 @@ void HeightManagerInit() {
 
     GPIOPinTypeADC(ADC_GPIO_BASE, ADC_GPIO_PIN);
 
+    /* Set to manual trigger so we can get a zero height reading. */
     ADCSequenceConfigure(ADC_BASE, ADC_SEQUENCE, ADC_TRIGGER_PROCESSOR, 0);
     ADCSequenceStepConfigure(ADC_BASE, ADC_SEQUENCE, 0, ADC_CHANNEL | ADC_CTL_IE | ADC_CTL_END);
     ADCSequenceEnable(ADC_BASE, ADC_SEQUENCE);
@@ -55,6 +56,9 @@ void HeightManagerInit() {
 
     ADCIntClear(ADC_BASE, ADC_SEQUENCE);
     ADCIntEnable(ADC_BASE, ADC_SEQUENCE);
+
+    /* Set to timer trigger for periodic height reading. */
+    ADCSequenceConfigure(ADC_BASE, ADC_SEQUENCE, ADC_TRIGGER_TIMER, 0);
 }
 
 int32_t GetHeight() {

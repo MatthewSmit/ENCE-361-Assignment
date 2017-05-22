@@ -24,10 +24,10 @@ void SwitchInit();
 void SwitchUpdate();
 
 /**
- * Get the switch state.
+ * Get the switch event.
  *
- * @return state of the switch, DOWN or UP.
+ * @return DOWN or UP slide of the switch.
  */
-uint8_t GetSwitchState();
+uint8_t GetSwitchEvent();
 
 #endif /* SWITCH_H_ */
