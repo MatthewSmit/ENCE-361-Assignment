@@ -30,13 +30,15 @@ void SwitchInit() {
     GPIOPinTypeGPIOInput(SWITCH_BASE, SWITCH_PIN);
     GPIOPadConfigSet(SWITCH_BASE, SWITCH_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPD);
 
-    current_state = GPIOPinRead(SWITCH_BASE, SWITCH_PIN);
+    /* Convert byte to bool */
+    current_state = !!GPIOPinRead(SWITCH_BASE, SWITCH_PIN);
     event = DOWN;
     count = 0;
 }
 
 void SwitchUpdate() {
-    uint8_t current_value = GPIOPinRead(SWITCH_BASE, SWITCH_PIN);
+    /* Convert byte to bool */
+    uint8_t current_value = !!GPIOPinRead(SWITCH_BASE, SWITCH_PIN);
 
     if (current_value != current_state) {
         count++;

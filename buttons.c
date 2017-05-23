@@ -94,10 +94,11 @@ void ButtonsInit() {
 
 void UpdateButtons() {
     bool current_value[NUM_BUTTONS];
-    current_value[BTN_UP] = GPIOPinRead(BTN_UP_BASE, BTN_UP_PIN);
-    current_value[BTN_DOWN] = GPIOPinRead(BTN_DOWN_BASE, BTN_DOWN_PIN);
-    current_value[BTN_LEFT] = GPIOPinRead(BTN_LEFT_BASE, BTN_LEFT_PIN);
-    current_value[BTN_RIGHT] = GPIOPinRead(BTN_RIGHT_BASE, BTN_RIGHT_PIN);
+    /* Convert byte to bool */
+    current_value[BTN_UP] = !!GPIOPinRead(BTN_UP_BASE, BTN_UP_PIN);
+    current_value[BTN_DOWN] = !!GPIOPinRead(BTN_DOWN_BASE, BTN_DOWN_PIN);
+    current_value[BTN_LEFT] = !!GPIOPinRead(BTN_LEFT_BASE, BTN_LEFT_PIN);
+    current_value[BTN_RIGHT] = !!GPIOPinRead(BTN_RIGHT_BASE, BTN_RIGHT_PIN);
 
     for (uint8_t i = 0; i < NUM_BUTTONS; i++) {
         if (current_value[i] != current_state[i]) {
