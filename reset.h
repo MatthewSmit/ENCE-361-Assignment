@@ -8,6 +8,6 @@
 #ifndef RESET_H_
 #define RESET_H_
 
-void InitReset(void);
+void ResetInit(void);
 
 #endif /* RESET_H_ */

@@ -26,11 +26,10 @@
 
 static void ResetHandler(void) {
     GPIOIntClear(RESET_PERIPH_BASE, RESET_PIN);
-    UARTprintf("Resetting Device\n");
     SysCtlReset();
 }
 
-void InitReset(void) {
+void ResetInit(void) {
     SysCtlPeripheralEnable(RESET_PERIPH_GPIO);
 
     GPIOPinTypeGPIOInput(RESET_PERIPH_BASE, RESET_PIN);

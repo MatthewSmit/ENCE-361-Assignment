@@ -17,7 +17,6 @@
 #include "buttons.h"
 #include "pwm_output.h"
 #include "yaw_controller.h"
-#include "yaw_manager.h"
 #include "height_controller.h"
 #include "switch.h"
 #include "buttons.h"
@@ -99,8 +98,6 @@ void UpdateFlightMode() {
     static bool wait_2 = false;
     bool event = GetSwitchEvent();
     uint8_t presses[4];
-    uint32_t target_height;
-    int32_t target_yaw;
 	switch (flight_state) {
 
 	case LANDED:

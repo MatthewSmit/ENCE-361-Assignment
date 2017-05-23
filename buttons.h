@@ -22,7 +22,7 @@ void ButtonsInit(void);
 /**
  * Update all of the buttons and their state. This code is fast enough to be run in an ISR.
  */
-void UpdateButtons(void);
+void UpdateButtons();
 
 /**
  * Get the button state.

@@ -39,10 +39,10 @@ tSchedulerTask g_psSchedulerTable[6];
 uint32_t g_ui32SchedulerNumTasks = 6;
 
 void Initialise(void);
-void Draw(void);
+void Draw();
 void RegisterTasks(void);
-void UpdateSerial(void);
-void DemoButtons(void);
+void UpdateSerial();
+void DemoButtons();
 
 #ifdef DEBUG
 void __error__(char *pcFilename, uint32_t ui32Line) {
@@ -67,6 +67,7 @@ void Initialise() {
     SchedulerInit(SYSTICK_FREQUENCY);
     SysTickIntRegister(SchedulerSysTickIntHandler);
 
+    ResetInit();
     ButtonsInit();
     SwitchInit();
 
@@ -116,7 +117,7 @@ void RegisterTasks(void) {
     task_ptr->ui32FrequencyTicks = 20;
 }
 
-void Draw(void) {
+void Draw() {
     char text_buffer[17];
     usnprintf(text_buffer, sizeof(text_buffer), "Ticks");
     OledStringDraw(text_buffer, 0, 0);
@@ -167,9 +168,6 @@ void UpdateSerial() {
     UARTprintf("Height: %3d, [%3d]\n", GetHeightPercentage(),
             GetTargetHeight());
     UARTprintf("Yaw:   %4d, [%4d]\n", GetYawDegrees(), GetTargetYaw());
-//    UARTprintf("Height: %d [%d]\n", GetHeight(), GetHeightPercentage());
-//    UARTprintf("----------\n\n");
-//	UARTprintf("k_p %d", (int) (k_p * 100));
 }
 
 int main(void) {

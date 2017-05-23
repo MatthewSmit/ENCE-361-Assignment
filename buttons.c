@@ -92,7 +92,7 @@ void ButtonsInit(void) {
     }
 }
 
-void UpdateButtons(void) {
+void UpdateButtons() {
     bool current_value[NUM_BUTTONS];
     /* Convert byte to bool */
     current_value[BTN_UP] = !!GPIOPinRead(BTN_UP_BASE, BTN_UP_PIN);
