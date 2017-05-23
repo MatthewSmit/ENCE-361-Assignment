@@ -62,6 +62,7 @@ void PwmInit() {
     PWMGenEnable(PWM_MAIN_BASE, PWM_MAIN_GEN);
 
     PWMGenPeriodSet(PWM_MAIN_BASE, PWM_MAIN_GEN, period);
+    SetPwmDutyCycle(MAIN_ROTOR, 2);
 
     /* Initialise Tail Rotor */
     SysCtlPeripheralEnable(PWM_TAIL_PERIPH_GPIO);
@@ -76,6 +77,7 @@ void PwmInit() {
     PWMGenEnable(PWM_TAIL_BASE, PWM_TAIL_GEN);
 
     PWMGenPeriodSet(PWM_TAIL_BASE, PWM_TAIL_GEN, period);
+    SetPwmDutyCycle(TAIL_ROTOR, 2);
 }
 
 void SetPwmDutyCycle(uint8_t pwm_output, uint32_t duty_cycle) {

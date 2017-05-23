@@ -85,7 +85,7 @@ void ButtonsInit() {
     default_state[BTN_RIGHT] = BTN_RIGHT_DEFAULT;
 
     /* Reset other variables */
-    for (int i = 0; i < NUM_BUTTONS; i++) {
+    for (uint8_t i = 0; i < NUM_BUTTONS; i++) {
         current_state[i] = default_state[i];
         count[i] = 0;
         pushes[i] = 0;
@@ -123,4 +123,17 @@ uint8_t NumPushes(uint8_t button_name) {
     if (!was_disabled)
         IntMasterEnable();
     return tmp_pushes;
+}
+
+void ResetPushes(void) {
+    bool was_disabled = IntMasterDisable();
+
+    for (uint8_t i = 0; i < NUM_BUTTONS; i++) {
+        current_state[i] = default_state[i];
+        count[i] = 0;
+        pushes[i] = 0;
+    }
+
+    if (!was_disabled)
+        IntMasterEnable();
 }

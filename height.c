@@ -44,7 +44,6 @@ void HeightManagerInit() {
     ADCSequenceStepConfigure(ADC_BASE, ADC_SEQUENCE, 0,
             ADC_CHANNEL | ADC_CTL_IE | ADC_CTL_END);
     ADCHardwareOversampleConfigure(ADC_BASE, 64);
-
     ADCSequenceEnable(ADC_BASE, ADC_SEQUENCE);
 
     ADCIntRegister(ADC_BASE, ADC_SEQUENCE, AdcHandler);

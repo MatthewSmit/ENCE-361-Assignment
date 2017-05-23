@@ -16,9 +16,10 @@ void PidInit(PidState *state) {
 int32_t UpdatePid(PidState *state, int32_t error, uint32_t delta_t,
         double proportional_gain, double integral_gain, double derivative_gain) {
 
-    state->error_integrated += error * delta_t;
-    uint32_t error_integrated = state->error_integrated;
-    double error_derivative = (error - state->error_previous) / delta_t;
+    state->error_integrated += error * (int32_t) delta_t;
+    int32_t error_integrated = state->error_integrated;
+    double error_derivative = (double) (error - state->error_previous)
+            / (double) delta_t;
 
     state->error_previous = error;
 

@@ -11,7 +11,7 @@
 /* State changes only after so many consecutive readings have an opposite value */
 #define NUM_POLLS 5
 
-enum {DOWN, UP};
+enum {SWITCH_DOWN, SWITCH_UP};
 
 /**
  * Initialise the switch.
@@ -21,7 +21,7 @@ void SwitchInit();
 /**
  * Update the switch state. This code is fast enough to be run in an ISR.
  */
-void SwitchUpdate();
+void UpdateSwitch();
 
 /**
  * Get the switch event.

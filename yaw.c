@@ -7,8 +7,7 @@
 #include "driverlib/interrupt.h"
 #include "driverlib/sysctl.h"
 
-#define NUMBER_SLOTS 112
-#define YAW_FULL_ROTATION   (NUMBER_SLOTS * 4)
+#include "yaw.h"
 
 #define YAW_PERIPH_GPIO     SYSCTL_PERIPH_GPIOB
 #define YAW_PERIPH_BASE     GPIO_PORTB_BASE
@@ -22,7 +21,7 @@
 #define YAW_REF_PIN             GPIO_PIN_4
 #define YAW_REF_INT             INT_GPIOC
 
-static int32_t yaw;
+static int32_t yaw = 0;
 static bool ref_found = false;
 
 static const int8_t lookup_table[] = {0, -1, 1, 0, 1, 0, 0, -1, -1, 0, 0, 1, 0, 1, -1, 0};

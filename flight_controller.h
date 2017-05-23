@@ -12,9 +12,9 @@ enum {
     LANDED, INIT, FLYING, LANDING
 };
 
-void PriorityTaskInit(void);
-void InitFlightController(void);
-void UpdateFlightMode(void);
+//void PriorityTaskInit(void);
+void FlightControllerInit(void);
+void UpdateFlightMode();
 uint8_t GetFlightMode(void);
 
 #endif /* FLIGHT_CONTROLLER_H_ */

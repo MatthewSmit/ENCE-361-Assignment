@@ -32,4 +32,9 @@ void UpdateButtons();
  */
 uint8_t NumPushes(uint8_t button_name);
 
+/**
+ * Reset the buttons.
+ */
+void ResetPushes(void);
+
 #endif /* BUTTONS_H_ */
