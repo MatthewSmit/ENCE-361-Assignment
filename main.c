@@ -23,24 +23,25 @@
 #include "utils/scheduler.h"
 
 #include "buttons.h"
+#include "flight_controller.h"
 #include "height_manager.h"
 #include "height_controller.h"
 #include "oled_interface.h"
+#include "reset.h"
 #include "serial_interface.h"
 #include "yaw_controller.h"
 #include "yaw_manager.h"
-#include "flight_controller.h"
 
 #define SYSTICK_FREQUENCY   200
 
 tSchedulerTask g_psSchedulerTable[3];
 uint32_t g_ui32SchedulerNumTasks = 3;
 
-void Initialise();
-void Draw();
-void RegisterTasks();
-void UpdateSerial();
-void DemoButtons();
+void Initialise(void);
+void Draw(void);
+void RegisterTasks(void);
+void UpdateSerial(void);
+void DemoButtons(void);
 
 #ifdef DEBUG
 void __error__(char *pcFilename, uint32_t ui32Line) {
@@ -49,7 +50,7 @@ void __error__(char *pcFilename, uint32_t ui32Line) {
 }
 #endif
 
-void Initialise() {
+void Initialise(void) {
     SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN| SYSCTL_XTAL_16MHZ);
 
     FPULazyStackingEnable();
@@ -62,12 +63,14 @@ void Initialise() {
     YawManagerInit();
     HeightManagerInit();
     PriorityTaskInit();
+    InitFlight();
+    InitReset();
 
     OledInit();
     SerialInit();
 }
 
-void RegisterTasks() {
+void RegisterTasks(void) {
     tSchedulerTask *task_ptr = g_psSchedulerTable;
     task_ptr->bActive = true;
     task_ptr->pfnFunction = UpdateButtons;
@@ -83,13 +86,13 @@ void RegisterTasks() {
     task_ptr->pfnFunction = Draw;
     task_ptr->ui32FrequencyTicks = 10;
 
-//    task_ptr++;
-//    task_ptr->bActive = true;
-//    task_ptr->pfnFunction = UpdateSerial;
-//    task_ptr->ui32FrequencyTicks = 20;
+    task_ptr++;
+    task_ptr->bActive = true;
+    task_ptr->pfnFunction = UpdateSerial;
+    task_ptr->ui32FrequencyTicks = 20;
 }
 
-void Draw() {
+void Draw(void) {
     char text_buffer[17];
     usnprintf(text_buffer, sizeof(text_buffer), "Ticks");
     OledStringDraw(text_buffer, 0, 0);
@@ -97,7 +100,7 @@ void Draw() {
     OledStringDraw(text_buffer, 0, 1);
 }
 
-void DemoButtons() {
+void DemoButtons(void) {
     static double gain = 100.0;
     static double scale = 1.0;
     static bool started = false;
@@ -130,14 +133,14 @@ void DemoButtons() {
     TuneParamTailRotor(1.0, 0.0, gain / 1000.0);
 }
 
-void UpdateSerial() {
+void UpdateSerial(void) {
     UARTprintf("%d, %d\n", GetYaw(), SchedulerTickCountGet());
 //    UARTprintf("Height: %d [%d]\n", GetHeight(), GetHeightPercentage());
 //    UARTprintf("----------\n\n");
 //	UARTprintf("k_p %d", (int) (k_p * 100));
 }
 
-int main() {
+int main(void) {
     Initialise();
     RegisterTasks();
     IntMasterEnable();

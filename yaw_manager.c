@@ -30,7 +30,7 @@ static const int8_t lookup_table[] = {0, -1, 1, 0, 1, 0, 0, -1, -1, 0, 0, 1, 0, 
 static void YawHandler() {
     static uint8_t state = 0;
     uint8_t previous_state = state;
-    state = (uint8_t) GPIOPinRead(YAW_PERIPH_BASE, YAW_GPIO_PINS);
+    state = (uint8_t)GPIOPinRead(YAW_PERIPH_BASE, YAW_GPIO_PINS);
 
     GPIOIntClear(YAW_PERIPH_BASE, YAW_GPIO_PINS);
 

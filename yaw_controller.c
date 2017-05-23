@@ -25,6 +25,7 @@ void SetTargetYaw(int32_t yaw) {
     ASSERT(yaw <= 360);
     ASSERT(yaw >= -360);
 
+    //TODO: Convert from degrees to "notches"?
     target_yaw = yaw;
 }
 

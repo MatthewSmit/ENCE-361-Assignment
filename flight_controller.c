@@ -14,9 +14,10 @@
 #include "driverlib/interrupt.h"
 #include "driverlib/timer.h"
 
-
+#include "buttons.h"
 #include "pwm_output.h"
 #include "yaw_controller.h"
+#include "yaw_manager.h"
 #include "height_controller.h"
 #include "switch.h"
 
@@ -27,9 +28,14 @@
 #define TIMER_TIMEOUT			TIMER_TIMA_TIMEOUT
 #define TIMER_INT				INT_TIMER0A
 
+#define HEIGHT_STEP             10
+#define YAW_STEP                15
+
 enum {LANDED, INIT, FLYING, LANDING};
 
 static uint8_t flight_state;
+static int32_t target_yaw;
+static int32_t target_height;
 
 void TimerHandler(void) {
     TimerIntClear(TIMER_BASE, TIMER_TIMEOUT);
@@ -67,25 +73,83 @@ void PriorityTaskInit(void) {
 
 void InitFlight(void) {
 	flight_state = LANDED;
+	target_yaw = 0;
+	target_height = 0;
 	SysCtlDelay(SysCtlClockGet());
 
 	SetTargetHeight(20);
-//	TimerInit();
 	PwmEnable(TAIL_ROTOR);
 	PwmEnable(MAIN_ROTOR);
+}
+
+void UpdateFlying(void) {
+    for (int32_t pushes = NumPushes(BTN_UP); pushes > 0; pushes--) {
+        target_height += HEIGHT_STEP;
+        if (target_height > 100) {
+            target_height = 100;
+        }
+    }
+
+    for (int32_t pushes = NumPushes(BTN_DOWN); pushes > 0; pushes--) {
+        target_height -= HEIGHT_STEP;
+        if (target_height < 0) {
+            target_height = 0;
+        }
+    }
+
+    for (int32_t pushes = NumPushes(BTN_LEFT); pushes > 0; pushes--) {
+        target_yaw -= YAW_STEP;
+        if (target_yaw < -360) {
+            target_yaw += 720;
+        }
+    }
+
+    for (int32_t pushes = NumPushes(BTN_RIGHT); pushes > 0; pushes--) {
+        target_yaw += YAW_STEP;
+        if (target_yaw > 360) {
+            target_yaw -= 720;
+        }
+    }
+
+    SetTargetHeight(target_height);
+    SetTargetYaw(target_yaw);
+}
+
+bool HasLanded(void) {
+    //TODO
+    return true;
 }
 
 void UpdateFlightMode(void) {
 	bool event = GetSwitchEvent();
 	switch (flight_state) {
 	case LANDED:
-		if (event == UP)
+		if (event == UP) {
+		    flight_state = INIT;
+		    //TODO: Start Init task to find reference yaw
+		}
 		break;
 	case INIT:
+	    if (YawRefFound()) {
+	        flight_state = FLYING;
+            ClearButtons();
+            SetTargetYaw(0);
+	    }
 		break;
 	case FLYING:
+	    if (event == DOWN) {
+	        flight_state = LANDING;
+	        SetTargetHeight(0);
+	        SetTargetYaw(0);
+	    }
+	    else {
+	        UpdateFlying();
+	    }
 		break;
 	case LANDING:
+	    if (HasLanded()) {
+	        flight_state = LANDED;
+	    }
 		break;
 	}
 }

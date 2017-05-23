@@ -17,12 +17,12 @@ enum {RELEASED, PUSHED};
 /**
  * Initialise the buttons.
  */
-void ButtonsInit();
+void ButtonsInit(void);
 
 /**
  * Update all of the buttons and their state. This code is fast enough to be run in an ISR.
  */
-void UpdateButtons();
+void UpdateButtons(void);
 
 /**
  * Get the button state.
@@ -31,5 +31,10 @@ void UpdateButtons();
  * @return state of the given button, RELEASED or PUSHED.
  */
 uint8_t NumPushes(uint8_t button_name);
+
+/**
+ * Clears the buttons state.
+ */
+void ClearButtons(void);
 
 #endif /* BUTTONS_H_ */
