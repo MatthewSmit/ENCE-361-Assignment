@@ -25,10 +25,10 @@ void ButtonsInit(void);
 void UpdateButtons();
 
 /**
- * Get the button state.
+ * Gets the number of pushes for a given button and resets the counter.
  *
  * @param button_name BUT_UP, BUT_DOWN, BUT_LEFT or BUT_RIGHT.
- * @return state of the given button, RELEASED or PUSHED.
+ * @return The number of pushes for the given button.
  */
 uint8_t NumPushes(uint8_t button_name);
 

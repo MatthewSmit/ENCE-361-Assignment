@@ -87,7 +87,7 @@ void FlightControllerInit(void) {
 	flight_state = LANDED;
     PwmInit();
     SetTargetHeight(0);
-    SetTargetYaw(0);
+    SetTargetYawDegrees(0);
     YawControllerInit();
     HeightControllerInit();
     PriorityTaskInit();
@@ -118,23 +118,21 @@ void UpdateFlightMode() {
             //
             // Go straight to FLYING state.
             //
-            SetPwmDutyCycle(TAIL_ROTOR, 5);
-            SetPwmDutyCycle(MAIN_ROTOR, 5);
+//            SetPwmDutyCycle(TAIL_ROTOR, 5);
+//            SetPwmDutyCycle(MAIN_ROTOR, 15);
             YawControllerInit();
             HeightControllerInit();
             PwmEnable(MAIN_ROTOR);
             PwmEnable(TAIL_ROTOR);
             PriorityTaskEnable();
-//            SetTargetHeight(height_min);
-//            SetTargetYaw(0);
             ResetPushes();
             flight_state = FLYING;
         } else if (!wait) {
             wait = true;
             YawRefTrigger();
             PriorityTaskDisable();
-            SetPwmDutyCycle(TAIL_ROTOR, 5);
-            SetPwmDutyCycle(MAIN_ROTOR, 20);
+            SetPwmDutyCycle(TAIL_ROTOR, 2);
+            SetPwmDutyCycle(MAIN_ROTOR, 25);
             PwmEnable(TAIL_ROTOR);
             PwmEnable(MAIN_ROTOR);
         }
@@ -182,16 +180,16 @@ void UpdateFlightMode() {
                 //
                 // Rotate counter-clockwise
                 //
-                target_yaw = GetTargetYaw() - presses[BTN_LEFT] * yaw_inc;
-                SetTargetYaw(target_yaw);
+                target_yaw = GetTargetYawDegrees() - presses[BTN_LEFT] * yaw_inc;
+                SetTargetYawDegrees(target_yaw);
             }
 
             if (presses[BTN_RIGHT] > 0) {
                 //
                 // Rotate clockwise
                 //
-                target_yaw = GetTargetYaw() + presses[BTN_RIGHT] * yaw_inc;
-                SetTargetYaw(target_yaw);
+                target_yaw = GetTargetYawDegrees() + presses[BTN_RIGHT] * yaw_inc;
+                SetTargetYawDegrees(target_yaw);
             }
         }
 		break;
@@ -203,9 +201,10 @@ void UpdateFlightMode() {
             //
             wait = true;
             target_yaw = GetTargetYaw();
-            SetTargetYaw(GetClosestYawRef(target_yaw));
+            int32_t yaw_ref = GetClosestYawRef(target_yaw);
+            SetTargetYaw(yaw_ref);
         } else if (wait_2) {
-            if ((GetYaw() == GetTargetYaw())
+            if ((GetYaw() == GetTargetYawDegrees())
                     && (GetHeight() == GetTargetHeight())) {
                 wait = false;
                 wait_2 = false;
@@ -214,7 +213,7 @@ void UpdateFlightMode() {
                 // TODO Reset the yaw to zero.
                 flight_state = LANDED;
             }
-        } else if (!wait_2 && GetYaw() == GetTargetYaw()) {
+        } else if (!wait_2 && GetYaw() == GetTargetYawDegrees()) {
             //
             // Wait until all landing criteria are met.
             //

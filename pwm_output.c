@@ -42,7 +42,9 @@
 #define PWM_DIVIDER_CODE        SYSCTL_PWMDIV_16
 #define PWM_DIVIDER             16
 
-void SetPwmRange(uint32_t min, uint32_t max);
+static bool pwm_state[2];
+
+bool GetPwmState(uint8_t pwm_output);
 
 void PwmInit() {
     SysCtlPWMClockSet(PWM_DIVIDER_CODE);
@@ -95,15 +97,33 @@ void SetPwmDutyCycle(uint8_t pwm_output, uint32_t duty_cycle) {
 	}
 }
 
+uint32_t GetPwmDutyCycle(uint8_t pwm_output) {
+    uint32_t duty_cycle;
+    uint32_t period = SysCtlClockGet() / PWM_DIVIDER / PWM_FREQUENCY;
+    if (pwm_state[pwm_output]) {
+        duty_cycle = PWMPulseWidthGet(PWM_MAIN_BASE, PWM_MAIN_OUTNUM) * 100
+                / period;
+    } else {
+        duty_cycle = 0;
+    }
+    return duty_cycle;
+}
+
 void SetPwmState(uint8_t pwm_output, bool state) {
 	switch (pwm_output) {
 	case MAIN_ROTOR:
 		PWMOutputState(PWM_MAIN_BASE, PWM_MAIN_OUTBIT, state);
+        pwm_state[MAIN_ROTOR] = state;
 		break;
 	case TAIL_ROTOR:
 		PWMOutputState(PWM_TAIL_BASE, PWM_TAIL_OUTBIT, state);
+        pwm_state[TAIL_ROTOR] = state;
 		break;
 	}
+}
+
+bool GetPwmState(uint8_t pwm_output) {
+    return pwm_state[pwm_output];
 }
 
 void PwmEnable(uint8_t pwm_output) {

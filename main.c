@@ -38,11 +38,18 @@
 tSchedulerTask g_psSchedulerTable[6];
 uint32_t g_ui32SchedulerNumTasks = 6;
 
+/*
+ * Register function prototypes.
+ */
 void Initialise(void);
-void Draw();
 void RegisterTasks(void);
-void UpdateSerial();
+
+/*
+ * Register task function prototypes.
+ */
+void Draw();
 void DemoButtons();
+void UpdateSerial();
 
 #ifdef DEBUG
 void __error__(char *pcFilename, uint32_t ui32Line) {
@@ -51,7 +58,7 @@ void __error__(char *pcFilename, uint32_t ui32Line) {
 }
 #endif
 
-void Initialise() {
+void Initialise(void) {
     /*
      * Set the clock to 80 MHz.
      */
@@ -75,11 +82,6 @@ void Initialise() {
     HeightManagerInit();
 
     FlightControllerInit();
-
-    //TODO
-//    PwmEnable(MAIN_ROTOR);
-//    PwmEnable(TAIL_ROTOR);
-//    SetTargetHeight(50);
 
     OledInit();
     SerialInit();
@@ -109,28 +111,28 @@ void RegisterTasks(void) {
     task_ptr++;
     task_ptr->bActive = true;
     task_ptr->pfnFunction = Draw;
-    task_ptr->ui32FrequencyTicks = 10;
+    task_ptr->ui32FrequencyTicks = 10; // Draw at 20 Hz.
 
     task_ptr++;
     task_ptr->bActive = true;
     task_ptr->pfnFunction = UpdateSerial;
-    task_ptr->ui32FrequencyTicks = 20;
+    task_ptr->ui32FrequencyTicks = 50; // Update the UART at a rate of 4 Hz.
 }
 
 void Draw() {
-    char text_buffer[17];
-    usnprintf(text_buffer, sizeof(text_buffer), "Ticks");
-    OledStringDraw(text_buffer, 0, 0);
-    usnprintf(text_buffer, sizeof(text_buffer), "%d", GetHeight());
-    OledStringDraw(text_buffer, 0, 1);
+//    char text_buffer[17];
+//    usnprintf(text_buffer, sizeof(text_buffer), "Ticks");
+//    OledStringDraw(text_buffer, 0, 0);
+//    usnprintf(text_buffer, sizeof(text_buffer), "%d", GetHeight());
+//    OledStringDraw(text_buffer, 0, 1);
 }
 
 void DemoButtons() {
-    uint8_t presses = NumPushes(BTN_UP);
-    if (presses > 0) {
-        PwmDisable(MAIN_ROTOR);
-        PwmDisable(TAIL_ROTOR);
-    }
+//    static bool toggle = false;
+//    uint8_t presses = NumPushes(BTN_UP);
+//    if (presses > 0) {
+//        toggle ? SchedulerTaskEnable(5, false) : SchedulerTaskDisable(5);
+//    }
 //    static double gain = 350.0;
 //    static double scale = 50.0;
 //    static bool started = false;
@@ -164,10 +166,25 @@ void DemoButtons() {
 //    HeightControllerInit();
 }
 
+/**
+ * Send heli info to UART.
+ */
 void UpdateSerial() {
-    UARTprintf("Height: %3d, [%3d]\n", GetHeightPercentage(),
-            GetTargetHeight());
-    UARTprintf("Yaw:   %4d, [%4d]\n", GetYawDegrees(), GetTargetYaw());
+    uint32_t height = GetHeightPercentage();
+    int32_t target_height = GetTargetHeight();
+    int32_t yaw = GetYawDegrees();
+    int32_t target_yaw = GetTargetYawDegrees();
+    uint32_t duty_cycle_main = GetPwmDutyCycle(MAIN_ROTOR);
+    uint32_t duty_cycle_tail = GetPwmDutyCycle(TAIL_ROTOR);
+    bool is_landed = GetFlightMode() == LANDED;
+    char *flight_mode = is_landed ? "Landed" : "Flying";
+
+    UARTprintf("Alt: %d [%d]\n"
+            "Yaw: %d [%d]\n"
+            "Main: [%d] Tail: [%d]\n"
+            "Mode: %s\n"
+            "\n", height, target_height, yaw, target_yaw, duty_cycle_main,
+            duty_cycle_tail, flight_mode);
 }
 
 int main(void) {

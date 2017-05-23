@@ -15,6 +15,8 @@
 /*
  * Public function prototypes
  */
+int32_t GetTargetYawDegrees(void);
+void SetTargetYawDegrees(int32_t yaw);
 int32_t GetTargetYaw(void);
 void SetTargetYaw(int32_t yaw);
 void YawControllerInit(void);

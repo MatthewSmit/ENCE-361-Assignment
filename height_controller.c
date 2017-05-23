@@ -56,7 +56,7 @@ void UpdateHeightController(uint32_t delta_t) {
             proportional_gain, integral_gain, derivative_gain);
 
     /* Clamp control inside valid range */
-    control = (control < 5) ? 5 : (control > 95) ? 95 : control;
+    control = (control < 10) ? 10 : (control > 95) ? 95 : control;
     SetPwmDutyCycle(MAIN_ROTOR, control);
 }
 

@@ -34,13 +34,22 @@ void YawControllerInit(void) {
     PidInit(&yaw_state);
 }
 
-void SetTargetYaw(int32_t yaw) {
+void SetTargetYawDegrees(int32_t yaw) {
     target_yaw_degrees = yaw;
     target_yaw = target_yaw_degrees * YAW_FULL_ROTATION / 360;
 }
 
-int32_t GetTargetYaw(void) {
+int32_t GetTargetYawDegrees(void) {
     return target_yaw_degrees;
+}
+
+int32_t GetTargetYaw(void) {
+    return target_yaw;
+}
+
+void SetTargetYaw(int32_t yaw) {
+    target_yaw = yaw;
+    target_yaw_degrees = target_yaw * 360 / YAW_FULL_ROTATION;
 }
 
 void UpdateYawController(uint32_t delta_t) {
@@ -49,7 +58,7 @@ void UpdateYawController(uint32_t delta_t) {
     int32_t control = UpdatePid(&yaw_state, error, delta_t, proportional_gain,
             integral_gain, derivative_gain);
     // TODO SetContraints(min, max)
-    control = (control < 2) ? 2 : (control > 95) ? 95 : control;
+    control = (control < 2) ? 2 : (control > 98) ? 98 : control;
     SetPwmDutyCycle(TAIL_ROTOR, control);
 }
 
