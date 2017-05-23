@@ -130,6 +130,7 @@ void UpdateFlightMode() {
         } else if (!wait) {
             wait = true;
             YawRefTrigger();
+            ZeroHeightTrigger();
             PriorityTaskDisable();
             SetPwmDutyCycle(TAIL_ROTOR, 2);
             SetPwmDutyCycle(MAIN_ROTOR, 25);
