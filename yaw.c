@@ -84,7 +84,6 @@ int32_t GetClosestYawRef(int32_t yaw) {
 }
 
 int32_t GetYawDegrees() {
-    int32_t tmp_yaw = GetYaw();
-    int32_t degrees = tmp_yaw * 360 / NUMBER_SLOTS;
+    int32_t degrees = yaw * 360 / YAW_FULL_ROTATION;
     return degrees;
 }

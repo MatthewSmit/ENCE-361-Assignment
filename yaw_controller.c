@@ -36,7 +36,7 @@ void YawControllerInit(void) {
 
 void SetTargetYaw(int32_t yaw) {
     target_yaw_degrees = yaw;
-    target_yaw = yaw * NUMBER_SLOTS / 360;
+    target_yaw = target_yaw_degrees * YAW_FULL_ROTATION / 360;
 }
 
 int32_t GetTargetYaw(void) {
