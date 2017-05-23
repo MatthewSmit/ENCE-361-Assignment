@@ -17,12 +17,12 @@ enum {RELEASED, PUSHED};
 /**
  * Initialise the buttons.
  */
-void ButtonsInit();
+void ButtonsInit(void);
 
 /**
  * Update all of the buttons and their state. This code is fast enough to be run in an ISR.
  */
-void UpdateButtons();
+void UpdateButtons(void);
 
 /**
  * Get the button state.

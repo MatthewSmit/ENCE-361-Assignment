@@ -25,6 +25,7 @@
 #include "buttons.h"
 #include "height_controller.h"
 #include "oled_interface.h"
+#include "reset.h"
 #include "serial_interface.h"
 #include "yaw_controller.h"
 #include "flight_controller.h"
@@ -37,11 +38,11 @@
 tSchedulerTask g_psSchedulerTable[6];
 uint32_t g_ui32SchedulerNumTasks = 6;
 
-void Initialise();
-void Draw();
-void RegisterTasks();
-void UpdateSerial();
-void DemoButtons();
+void Initialise(void);
+void Draw(void);
+void RegisterTasks(void);
+void UpdateSerial(void);
+void DemoButtons(void);
 
 #ifdef DEBUG
 void __error__(char *pcFilename, uint32_t ui32Line) {
@@ -83,7 +84,7 @@ void Initialise() {
     SerialInit();
 }
 
-void RegisterTasks() {
+void RegisterTasks(void) {
     tSchedulerTask *task_ptr = g_psSchedulerTable;
     task_ptr->bActive = true;
     task_ptr->pfnFunction = UpdateButtons;
@@ -115,7 +116,7 @@ void RegisterTasks() {
     task_ptr->ui32FrequencyTicks = 20;
 }
 
-void Draw() {
+void Draw(void) {
     char text_buffer[17];
     usnprintf(text_buffer, sizeof(text_buffer), "Ticks");
     OledStringDraw(text_buffer, 0, 0);
@@ -171,7 +172,7 @@ void UpdateSerial() {
 //	UARTprintf("k_p %d", (int) (k_p * 100));
 }
 
-int main() {
+int main(void) {
     Initialise();
     RegisterTasks();
     IntMasterEnable();

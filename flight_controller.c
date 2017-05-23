@@ -14,9 +14,10 @@
 #include "driverlib/interrupt.h"
 #include "driverlib/timer.h"
 
-
+#include "buttons.h"
 #include "pwm_output.h"
 #include "yaw_controller.h"
+#include "yaw_manager.h"
 #include "height_controller.h"
 #include "switch.h"
 #include "buttons.h"
@@ -37,6 +38,8 @@ static const uint8_t height_max = 100;
 static const uint8_t yaw_inc = 15;
 
 static uint8_t flight_state;
+static int32_t target_yaw;
+static int32_t target_height;
 
 void TimerHandler(void) {
     TimerIntClear(TIMER_BASE, TIMER_TIMEOUT);

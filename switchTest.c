@@ -69,7 +69,7 @@ void RegisterTasks() {
 }
 
 void Draw() {
-    uint8_t status = GetSwitchState();
+    uint8_t status = GetSwitchEvent();
 
     char text_buffer[17];
     usnprintf(text_buffer, sizeof(text_buffer), "Switch State:");
