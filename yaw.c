@@ -9,12 +9,12 @@
 
 #include "yaw.h"
 
-#define YAW_PERIPH_GPIO     SYSCTL_PERIPH_GPIOB
-#define YAW_PERIPH_BASE     GPIO_PORTB_BASE
-#define YAW_CHANNEL_A       GPIO_PIN_0
-#define YAW_CHANNEL_B       GPIO_PIN_1
-#define YAW_GPIO_PINS       (YAW_CHANNEL_A | YAW_CHANNEL_B)
-#define YAW_INT             INT_GPIOB
+#define YAW_PERIPH_GPIO         SYSCTL_PERIPH_GPIOB
+#define YAW_PERIPH_BASE         GPIO_PORTB_BASE
+#define YAW_CHANNEL_A           GPIO_PIN_0
+#define YAW_CHANNEL_B           GPIO_PIN_1
+#define YAW_GPIO_PINS           (YAW_CHANNEL_A | YAW_CHANNEL_B)
+#define YAW_INT                 INT_GPIOB
 
 #define YAW_REF_PERIPH          SYSCTL_PERIPH_GPIOC
 #define YAW_REF_BASE            GPIO_PORTC_BASE
@@ -29,7 +29,7 @@ static const int8_t lookup_table[] = {0, -1, 1, 0, 1, 0, 0, -1, -1, 0, 0, 1, 0, 
 static void YawHandler() {
     static uint8_t state = 0;
     uint8_t previous_state = state;
-    state = (uint8_t)GPIOPinRead(YAW_PERIPH_BASE, YAW_GPIO_PINS);
+    state = (uint8_t) GPIOPinRead(YAW_PERIPH_BASE, YAW_GPIO_PINS);
 
     GPIOIntClear(YAW_PERIPH_BASE, YAW_GPIO_PINS);
 
@@ -37,34 +37,42 @@ static void YawHandler() {
 }
 
 static void YawRefHandler() {
-    yaw = 0;
-    ref_found = true;
-    IntDisable(YAW_REF_INT);
-    GPIOIntClear(YAW_REF_BASE, YAW_REF_PIN);
+    if ((bool) GPIOPinRead(YAW_REF_BASE, YAW_REF_PIN)) {
+        GPIOIntDisable(YAW_REF_BASE, YAW_REF_PIN);
+        GPIOIntClear(YAW_REF_BASE, YAW_REF_PIN);
+        yaw = 0;
+        ref_found = true;
+    }
 }
 
 void YawManagerInit() {
     SysCtlPeripheralEnable(YAW_PERIPH_GPIO);
-
     GPIOPinTypeGPIOInput(YAW_PERIPH_BASE, YAW_GPIO_PINS);
     GPIOPadConfigSet(YAW_PERIPH_BASE, YAW_GPIO_PINS, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPD);
     GPIODirModeSet(YAW_PERIPH_BASE, YAW_GPIO_PINS, GPIO_DIR_MODE_IN);
+
     GPIOIntTypeSet(YAW_PERIPH_BASE, YAW_GPIO_PINS, GPIO_BOTH_EDGES);
     GPIOIntRegister(YAW_PERIPH_BASE, YawHandler);
+    GPIOIntClear(YAW_PERIPH_BASE, YAW_GPIO_PINS);
     GPIOIntEnable(YAW_PERIPH_BASE, YAW_GPIO_PINS);
     IntEnable(YAW_INT);
 
+
     SysCtlPeripheralEnable(YAW_REF_PERIPH);
     GPIOPinTypeGPIOInput(YAW_REF_BASE, YAW_REF_PIN);
-    GPIOPadConfigSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPD);
+    GPIOPadConfigSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_STRENGTH_2MA,
+            GPIO_PIN_TYPE_STD_WPD);
     GPIODirModeSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_DIR_MODE_IN);
+
     GPIOIntTypeSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_RISING_EDGE);
     GPIOIntRegister(YAW_REF_BASE, YawRefHandler);
-    GPIOIntEnable(YAW_REF_BASE, YAW_REF_PIN);
+    GPIOIntClear(YAW_REF_BASE, YAW_REF_PIN);
+    GPIOIntDisable(YAW_REF_BASE, YAW_REF_PIN);
+    IntEnable(YAW_REF_INT);
 }
 
 void YawRefTrigger() {
-    IntEnable(YAW_REF_INT);
+    GPIOIntEnable(YAW_REF_BASE, YAW_REF_PIN);
 }
 
 bool YawRefFound() {

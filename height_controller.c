@@ -25,6 +25,10 @@ static PidState height_state;
 static uint32_t target_height;
 
 void HeightControllerInit(void) {
+//    integral_time = period / 2.0;
+//    derivative_time = period / 3.0;
+//
+//    proportional_gain = ultimate_gain * 0.33;
     integral_time = period * 2.2;
     derivative_time = period / 6.3;
 
@@ -56,7 +60,7 @@ void UpdateHeightController(uint32_t delta_t) {
             proportional_gain, integral_gain, derivative_gain);
 
     /* Clamp control inside valid range */
-    control = (control < 10) ? 10 : (control > 95) ? 95 : control;
+    control = (control < 15) ? 15 : (control > 98) ? 98 : control;
     SetPwmDutyCycle(MAIN_ROTOR, control);
 }
 

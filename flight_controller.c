@@ -118,8 +118,6 @@ void UpdateFlightMode() {
             //
             // Go straight to FLYING state.
             //
-//            SetPwmDutyCycle(TAIL_ROTOR, 5);
-//            SetPwmDutyCycle(MAIN_ROTOR, 15);
             YawControllerInit();
             HeightControllerInit();
             PwmEnable(MAIN_ROTOR);
@@ -133,7 +131,7 @@ void UpdateFlightMode() {
             ZeroHeightTrigger();
             PriorityTaskDisable();
             SetPwmDutyCycle(TAIL_ROTOR, 2);
-            SetPwmDutyCycle(MAIN_ROTOR, 25);
+            SetPwmDutyCycle(MAIN_ROTOR, 20);
             PwmEnable(TAIL_ROTOR);
             PwmEnable(MAIN_ROTOR);
         }
