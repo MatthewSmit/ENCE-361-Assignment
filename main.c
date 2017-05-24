@@ -120,11 +120,18 @@ void RegisterTasks(void) {
 }
 
 void Draw() {
-//    char text_buffer[17];
-//    usnprintf(text_buffer, sizeof(text_buffer), "Ticks");
-//    OledStringDraw(text_buffer, 0, 0);
-//    usnprintf(text_buffer, sizeof(text_buffer), "%d", GetHeight());
-//    OledStringDraw(text_buffer, 0, 1);
+    int32_t height = GetHeightPercentage();
+    uint32_t target_height = GetTargetHeight();
+    int32_t yaw = GetYawDegrees();
+    int32_t target_yaw = GetTargetYawDegrees();
+    char text_buffer[17];
+    OledClearBuffer();
+    usnprintf(text_buffer, sizeof(text_buffer), "Alt: %d [%d]", height,
+            target_height);
+    OledStringDraw(text_buffer, 0, 0);
+    usnprintf(text_buffer, sizeof(text_buffer), "Yaw: %d [%d]", yaw,
+            target_yaw);
+    OledStringDraw(text_buffer, 0, 1);
 }
 
 void DemoButtons() {
@@ -170,8 +177,8 @@ void DemoButtons() {
  * Send heli info to UART.
  */
 void UpdateSerial() {
-    uint32_t height = GetHeightPercentage();
-    int32_t target_height = GetTargetHeight();
+    int32_t height = GetHeightPercentage();
+    uint32_t target_height = GetTargetHeight();
     int32_t yaw = GetYawDegrees();
     int32_t target_yaw = GetTargetYawDegrees();
     uint32_t duty_cycle_main = GetPwmDutyCycle(MAIN_ROTOR);

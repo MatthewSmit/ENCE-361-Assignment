@@ -18,7 +18,7 @@ void OledStringDraw(char *string_ptr, uint32_t x_char, uint32_t y_char) {
     OrbitOledPutString(string_ptr);
 }
 
-void OledInit() {
+void OledInit(void) {
     /*
      * Initialize the OLED display
      */
@@ -26,5 +26,9 @@ void OledInit() {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE);    //Need signals on GPIOE
 
     OrbitOledInit();
+}
+
+void OledClearBuffer(void) {
+    OrbitOledClearBuffer();
 }
 

@@ -101,8 +101,16 @@ uint32_t GetPwmDutyCycle(uint8_t pwm_output) {
     uint32_t duty_cycle;
     uint32_t period = SysCtlClockGet() / PWM_DIVIDER / PWM_FREQUENCY;
     if (pwm_state[pwm_output]) {
-        duty_cycle = PWMPulseWidthGet(PWM_MAIN_BASE, PWM_MAIN_OUTNUM) * 100
-                / period;
+        switch (pwm_output) {
+        case MAIN_ROTOR:
+            duty_cycle = PWMPulseWidthGet(PWM_MAIN_BASE, PWM_MAIN_OUTNUM) * 100
+                    / period;
+            break;
+        case TAIL_ROTOR:
+            duty_cycle = PWMPulseWidthGet(PWM_TAIL_BASE, PWM_TAIL_OUTNUM) * 100
+                    / period;
+            break;
+        }
     } else {
         duty_cycle = 0;
     }

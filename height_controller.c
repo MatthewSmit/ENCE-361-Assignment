@@ -22,7 +22,7 @@ static double integral_gain;
 static double derivative_gain;
 
 static PidState height_state;
-static int32_t target_height;
+static uint32_t target_height;
 
 void HeightControllerInit(void) {
     integral_time = period * 2.2;
@@ -51,7 +51,7 @@ uint32_t GetTargetHeight(void) {
 
 void UpdateHeightController(uint32_t delta_t) {
 	int32_t height = GetHeightPercentage();
-    int32_t error = target_height - height;
+    int32_t error = (int32_t) target_height - height;
     int32_t control = UpdatePid(&height_state, error, delta_t,
             proportional_gain, integral_gain, derivative_gain);
 
@@ -61,7 +61,7 @@ void UpdateHeightController(uint32_t delta_t) {
 }
 
 void TuneParamMainRotor(double k_p1, double k_i1, double k_d1) {
-//	proportional_gain = k_p1;
+    proportional_gain = k_p1;
     integral_time = k_i1;
     derivative_time = k_d1;
 }
