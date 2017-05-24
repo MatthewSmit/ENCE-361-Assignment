@@ -205,7 +205,7 @@ void UpdateFlightMode() {
             int32_t yaw_ref = GetClosestYawRef(target_yaw);
             SetTargetYaw(yaw_ref);
         } else if (wait_2) {
-            if ((GetYaw() == GetTargetYawDegrees())
+            if ((GetYawDegrees() == GetTargetYawDegrees())
                     && (GetHeight() == GetTargetHeight())) {
                 wait = false;
                 wait_2 = false;
@@ -214,7 +214,7 @@ void UpdateFlightMode() {
                 // TODO Reset the yaw to zero.
                 flight_state = LANDED;
             }
-        } else if (!wait_2 && GetYaw() == GetTargetYawDegrees()) {
+        } else if (!wait_2 && GetYawDegrees() == GetTargetYawDegrees()) {
             //
             // Wait until all landing criteria are met.
             //
