@@ -13,7 +13,8 @@
 #include "driverlib/pin_map.h"
 #include "driverlib/sysctl.h"
 
-#define FULL_SCALE_RANGE 993
+#define FULL_SCALE_RANGE 993 // 0.8 V sensor range
+//#define FULL_SCALE_RANGE 1241 // 1.0 V sensor range
 
 #define ADC_GPIO_BASE       GPIO_PORTE_BASE
 #define ADC_GPIO_PIN        GPIO_PIN_4
@@ -24,6 +25,7 @@
 #define ADC_PERIPH_GPIO     SYSCTL_PERIPH_GPIOE
 
 static uint32_t zero_reading;
+static bool ref_found = false;
 static volatile uint32_t adc_val;
 
 void AdcHandler() {
@@ -40,8 +42,6 @@ void HeightManagerInit() {
     GPIOPinTypeADC(ADC_GPIO_BASE, ADC_GPIO_PIN);
 
     ADCIntRegister(ADC_BASE, ADC_SEQUENCE, AdcHandler);
-
-    zero_reading = 0;
 
     ADCIntClear(ADC_BASE, ADC_SEQUENCE);
     ADCIntEnable(ADC_BASE, ADC_SEQUENCE);
@@ -69,6 +69,7 @@ void ZeroHeightTrigger(void) {
     }
     ADCSequenceDataGet(ADC_BASE, ADC_SEQUENCE, &zero_reading);
     adc_val = zero_reading;
+    ref_found = true;
 
     /* Set back to timer trigger for periodic height reading. */
     ADCSequenceDisable(ADC_BASE, ADC_SEQUENCE);
@@ -79,7 +80,11 @@ void ZeroHeightTrigger(void) {
 }
 
 int32_t GetHeight() {
-    return zero_reading - adc_val;
+    if (ref_found) {
+        return zero_reading - adc_val;
+    } else {
+        return 0;
+    }
 }
 
 int32_t GetHeightPercentage() {

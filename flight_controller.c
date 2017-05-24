@@ -132,7 +132,7 @@ void UpdateFlightMode() {
             YawRefTrigger();
             ZeroHeightTrigger();
             PriorityTaskDisable();
-            SetPwmDutyCycle(TAIL_ROTOR, 2);
+            SetPwmDutyCycle(TAIL_ROTOR, 5);
             SetPwmDutyCycle(MAIN_ROTOR, 25);
             PwmEnable(TAIL_ROTOR);
             PwmEnable(MAIN_ROTOR);
@@ -196,16 +196,16 @@ void UpdateFlightMode() {
 		break;
 
 	case LANDING:
+        target_yaw = GetTargetYaw();
         if (!wait) {
             //
             // Wait until yaw is at closest reference.
             //
             wait = true;
-            target_yaw = GetTargetYaw();
             int32_t yaw_ref = GetClosestYawRef(target_yaw);
             SetTargetYaw(yaw_ref);
         } else if (wait_2) {
-            if ((GetYawDegrees() == GetTargetYawDegrees())
+            if ((GetYaw() == target_yaw)
                     && (GetHeight() == GetTargetHeight())) {
                 wait = false;
                 wait_2 = false;
@@ -214,7 +214,7 @@ void UpdateFlightMode() {
                 // TODO Reset the yaw to zero.
                 flight_state = LANDED;
             }
-        } else if (!wait_2 && GetYawDegrees() == GetTargetYawDegrees()) {
+        } else if (!wait_2 && GetYaw() == target_yaw) {
             //
             // Wait until all landing criteria are met.
             //
