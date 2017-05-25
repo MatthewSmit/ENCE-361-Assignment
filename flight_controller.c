@@ -220,7 +220,6 @@ void UpdateFlightMode() {
                 wait_2 = false;
                 PwmDisable(MAIN_ROTOR);
                 PwmDisable(TAIL_ROTOR);
-                // TODO Reset the yaw to zero.
                 flight_state = LANDED;
             }
         } else if (!wait_2 && GetYaw() == target_yaw) {

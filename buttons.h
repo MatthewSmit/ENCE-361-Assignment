@@ -20,7 +20,7 @@ enum {RELEASED, PUSHED};
 void ButtonsInit(void);
 
 /**
- * Update all of the buttons and their state. This code is fast enough to be run in an ISR.
+ * Update all of the buttons and their state.
  */
 void UpdateButtons();
 

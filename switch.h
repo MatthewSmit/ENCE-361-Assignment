@@ -11,7 +11,9 @@
 /* State changes only after so many consecutive readings have an opposite value */
 #define NUM_POLLS 5
 
-enum {SWITCH_DOWN, SWITCH_UP};
+enum {
+    SWITCH_DOWN, SWITCH_UP
+};
 
 /**
  * Initialise the switch.
