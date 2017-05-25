@@ -37,7 +37,7 @@ static void YawHandler() {
 }
 
 static void YawRefHandler() {
-    if ((bool) GPIOPinRead(YAW_REF_BASE, YAW_REF_PIN)) {
+    if (GPIOIntStatus(YAW_REF_BASE, YAW_REF_PIN) & YAW_REF_PIN) {
         GPIOIntDisable(YAW_REF_BASE, YAW_REF_PIN);
         GPIOIntClear(YAW_REF_BASE, YAW_REF_PIN);
         yaw = 0;
@@ -56,7 +56,6 @@ void YawManagerInit() {
     GPIOIntClear(YAW_PERIPH_BASE, YAW_GPIO_PINS);
     GPIOIntEnable(YAW_PERIPH_BASE, YAW_GPIO_PINS);
     IntEnable(YAW_INT);
-
 
     SysCtlPeripheralEnable(YAW_REF_PERIPH);
     GPIOPinTypeGPIOInput(YAW_REF_BASE, YAW_REF_PIN);

@@ -13,6 +13,7 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/interrupt.h"
 #include "driverlib/timer.h"
+#include "utils/scheduler.h"
 
 #include "buttons.h"
 #include "pwm_output.h"
@@ -24,12 +25,15 @@
 #include "height.h"
 #include "flight_controller.h"
 
+
 #define TIMER_PERIPH			SYSCTL_PERIPH_TIMER0
 #define TIMER_BASE				TIMER0_BASE
 #define TIMER_CONFIG			TIMER_CFG_PERIODIC
 #define TIMER_TIMER				TIMER_A
 #define TIMER_TIMEOUT			TIMER_TIMA_TIMEOUT
 #define TIMER_INT				INT_TIMER0A
+
+#define RATE_OF_DESCENT			30 // Rate of descent (ms per decrement of duty cycle)
 
 static const uint8_t height_inc = 10;
 static const uint8_t height_min = 0;
@@ -130,9 +134,9 @@ void UpdateFlightMode() {
             YawRefTrigger();
             ZeroHeightTrigger();
             PriorityTaskDisable();
-            SetPwmDutyCycle(TAIL_ROTOR, 2);
-            SetPwmDutyCycle(MAIN_ROTOR, 20);
-            PwmEnable(TAIL_ROTOR);
+//            SetPwmDutyCycle(TAIL_ROTOR, 2);
+            SetPwmDutyCycle(MAIN_ROTOR, 30);
+//            PwmEnable(TAIL_ROTOR);
             PwmEnable(MAIN_ROTOR);
         }
         break;
@@ -195,6 +199,7 @@ void UpdateFlightMode() {
 
 	case LANDING:
         target_yaw = GetTargetYaw();
+        uint32_t elapsed_ticks = 0;
         if (!wait) {
             //
             // Wait until yaw is at closest reference.
@@ -203,6 +208,12 @@ void UpdateFlightMode() {
             int32_t yaw_ref = GetClosestYawRef(target_yaw);
             SetTargetYaw(yaw_ref);
         } else if (wait_2) {
+        	if (GetTargetHeight() > 0) {
+        		if ((SchedulerElapsedTicksGet(elapsed_ticks) * (1000 / PWM_FREQUENCY)) >= RATE_OF_DESCENT) {
+        			elapsed_ticks = SchedulerTickCountGet();
+        			SetTargetHeight(GetTargetHeight() - 1);
+        		}
+        	}
             if ((GetYaw() == target_yaw)
                     && (GetHeight() == GetTargetHeight())) {
                 wait = false;
@@ -217,7 +228,7 @@ void UpdateFlightMode() {
             // Wait until all landing criteria are met.
             //
             wait_2 = true;
-            SetTargetHeight(height_min);
+            elapsed_ticks = SchedulerTickCountGet();
         }
 		break;
 	}

@@ -4,7 +4,7 @@
 	<deviceVariant value="Cortex M.TM4C123GH6PM"/>
 	<deviceFamily value="TMS470"/>
 	<deviceEndianness value="little"/>
-	<codegenToolVersion value="15.12.4.LTS"/>
+	<codegenToolVersion value="15.12.3.LTS"/>
 	<isElfFormat value="true"/>
 	<connection value="common/targetdb/connections/Stellaris_ICDI_Connection.xml"/>
 	<linkerCommandFile value="tm4c123gh6pm.cmd"/>

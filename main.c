@@ -33,8 +33,6 @@
 #include "yaw.h"
 #include "switch.h"
 
-#define SYSTICK_FREQUENCY   200
-
 tSchedulerTask g_psSchedulerTable[6];
 uint32_t g_ui32SchedulerNumTasks = 6;
 
@@ -71,7 +69,7 @@ void Initialise(void) {
     //
     FPULazyStackingEnable();
 
-    SchedulerInit(SYSTICK_FREQUENCY);
+    SchedulerInit(PWM_FREQUENCY);
     SysTickIntRegister(SchedulerSysTickIntHandler);
 
     ResetInit();

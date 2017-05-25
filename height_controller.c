@@ -40,10 +40,6 @@ void HeightControllerInit(void) {
 }
 
 void SetTargetHeight(uint32_t height) {
-    /*
-     * Check height in {0, 10, 20, ..., 100}
-     */
-	ASSERT(height % 10 == 0);
     ASSERT(height <= 100);
 
 	target_height = height;
