@@ -25,7 +25,6 @@
 #include "height.h"
 #include "flight_controller.h"
 
-
 #define TIMER_PERIPH			SYSCTL_PERIPH_TIMER0
 #define TIMER_BASE				TIMER0_BASE
 #define TIMER_CONFIG			TIMER_CFG_PERIODIC
@@ -34,11 +33,15 @@
 #define TIMER_INT				INT_TIMER0A
 
 #define RATE_OF_DESCENT			30 // Rate of descent (ms per decrement of duty cycle)
+#define YAW_BUFFER_SIZE         5
 
 static const uint8_t height_inc = 10;
 static const uint8_t height_min = 0;
 static const uint8_t height_max = 100;
 static const uint8_t yaw_inc = 15;
+
+static uint16_t yaw_difference_buffer[YAW_BUFFER_SIZE];
+static uint32_t yaw_difference_ptr;
 
 static uint8_t flight_state;
 static int32_t target_yaw;
@@ -207,27 +210,49 @@ void UpdateFlightMode() {
             wait = true;
             int32_t yaw_ref = GetClosestYawRef(target_yaw);
             SetTargetYaw(yaw_ref);
-        } else if (wait_2) {
-        	if (GetTargetHeight() > 0) {
-        		if ((SchedulerElapsedTicksGet(elapsed_ticks) * (1000 / PWM_FREQUENCY)) >= RATE_OF_DESCENT) {
-        			elapsed_ticks = SchedulerTickCountGet();
-        			SetTargetHeight(GetTargetHeight() - 1);
-        		}
-        	}
-            if ((GetYaw() == target_yaw)
-                    && (GetHeight() == GetTargetHeight())) {
-                wait = false;
-                wait_2 = false;
-                PwmDisable(MAIN_ROTOR);
-                PwmDisable(TAIL_ROTOR);
-                flight_state = LANDED;
+
+            for (uint32_t i = 0; i < YAW_BUFFER_SIZE; i++) {
+                yaw_difference_buffer[i] = 0xFFFF;
             }
-        } else if (!wait_2 && GetYaw() == target_yaw) {
+            yaw_difference_ptr = 0;
+        } else {
             //
-            // Wait until all landing criteria are met.
+            // Get the absolute difference between target and actual yaw, then add it to a buffer.
             //
-            wait_2 = true;
-            elapsed_ticks = SchedulerTickCountGet();
+            uint16_t yaw_difference = abs(GetYaw() - GetTargetYaw());
+            yaw_difference_buffer[yaw_difference_ptr] = yaw_difference;
+            yaw_difference_ptr = (yaw_difference_ptr + 1) % YAW_BUFFER_SIZE;
+
+            //
+            // Calculate the sum of the yaw differences over the past YAW_BUFFER_SIZE updates.
+            //
+            uint32_t yaw_difference_sum = 0;
+            for (uint32_t i = 0; i < YAW_BUFFER_SIZE; i++) {
+                yaw_difference_sum += yaw_difference_buffer[i];
+            }
+
+            if (wait_2) {
+                if (GetTargetHeight() > 0) {
+                    if ((SchedulerElapsedTicksGet(elapsed_ticks) * (1000 / PWM_FREQUENCY)) >= RATE_OF_DESCENT) {
+                        elapsed_ticks = SchedulerTickCountGet();
+                        SetTargetHeight(GetTargetHeight() - 1);
+                    }
+                }
+                if ((yaw_difference <= 10)
+                        && (GetHeight() == GetTargetHeight())) {
+                    wait = false;
+                    wait_2 = false;
+                    PwmDisable(MAIN_ROTOR);
+                    PwmDisable(TAIL_ROTOR);
+                    flight_state = LANDED;
+                }
+            } else if (!wait_2 && yaw_difference <= 10) {
+                //
+                // Wait until all landing criteria are met.
+                //
+                wait_2 = true;
+                elapsed_ticks = SchedulerTickCountGet();
+            }
         }
 		break;
 	}
