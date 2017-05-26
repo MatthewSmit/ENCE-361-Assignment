@@ -17,7 +17,6 @@
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
 
-
 #define UART_BASE               UART0_BASE
 #define UART_PORT               0
 #define UART_GPIO_BASE          GPIO_PORTA_BASE

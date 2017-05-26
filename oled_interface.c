@@ -22,8 +22,8 @@ void OledInit(void) {
     /*
      * Initialize the OLED display
      */
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD); //Need signals on GPIOD
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE); //Need signals on GPIOE
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOD); // Need signals on GPIOD
+    SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOE); // Need signals on GPIOE
 
     OrbitOledInit();
 }

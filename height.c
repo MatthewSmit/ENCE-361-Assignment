@@ -50,6 +50,7 @@ void HeightManagerInit() {
     ADCSequenceDisable(ADC_BASE, ADC_SEQUENCE);
     ADCSequenceConfigure(ADC_BASE, ADC_SEQUENCE, ADC_TRIGGER_TIMER, 0);
     ADCSequenceStepConfigure(ADC_BASE, ADC_SEQUENCE, 0, ADC_CHANNEL | ADC_CTL_IE | ADC_CTL_END);
+    ADCHardwareOversampleConfigure(ADC_BASE, 64);
     ADCSequenceEnable(ADC_BASE, ADC_SEQUENCE);
 }
 
@@ -57,7 +58,6 @@ void ZeroHeightTrigger(void) {
     /* Set to manual trigger so we can get a zero height reading. */
     ADCSequenceDisable(ADC_BASE, ADC_SEQUENCE);
     ADCSequenceConfigure(ADC_BASE, ADC_SEQUENCE, ADC_TRIGGER_PROCESSOR, 0);
-    ADCHardwareOversampleConfigure(ADC_BASE, 64);
     ADCSequenceEnable(ADC_BASE, ADC_SEQUENCE);
 
     ADCIntDisable(ADC_BASE, ADC_SEQUENCE);
