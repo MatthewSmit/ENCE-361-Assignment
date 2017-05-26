@@ -15,6 +15,7 @@
 #include "driverlib/interrupt.h"
 #include "driverlib/timer.h"
 #include "utils/scheduler.h"
+#include "utils/uartstdio.h"
 
 #include "buttons.h"
 #include "pwm_output.h"
@@ -67,13 +68,13 @@ static const uint8_t yaw_inc = 15;
 /*
  * Tolerance to ascertain if yaw has reached target yaw. Rounded up.
  */
-static uint16_t const yaw_tolerance = (uint16_t) (YAW_SAMPLE_TOLERANCE * NUM_ERROR_SAMPLES);
+static const uint16_t yaw_tolerance = YAW_SAMPLE_TOLERANCE * NUM_ERROR_SAMPLES;
 static uint16_t yaw_error_buf[NUM_ERROR_SAMPLES];
 
 /*
  * Tolerance to ascertain if height has reached target height. Rounded up.
  */
-static uint16_t const height_tolerance = (uint16_t) (HEIGHT_SAMPLE_TOLERANCE * NUM_ERROR_SAMPLES);
+static const uint16_t height_tolerance = HEIGHT_SAMPLE_TOLERANCE * NUM_ERROR_SAMPLES;
 static uint16_t height_error_buf[NUM_ERROR_SAMPLES];
 
 static uint8_t flight_state;
@@ -131,12 +132,13 @@ void FlightControllerInit(void) {
     YawControllerInit();
     HeightControllerInit();
     PriorityTaskInit();
+    ResetError();
 }
 
 void UpdateError(void) {
     static uint32_t idx = 0;
-    uint16_t yaw_sample_err = (uint16_t) abs(GetYaw() - GetTargetYaw());
-    uint16_t height_sample_err = (uint16_t) abs(GetHeight() - (int32_t) GetTargetHeight());
+    uint16_t yaw_sample_err = abs(GetYaw() - GetTargetYaw());
+    uint16_t height_sample_err = abs(GetHeight() - (int32_t) GetTargetHeight());
     yaw_error_buf[idx] = yaw_sample_err;
     height_error_buf[idx] = height_sample_err;
     idx = (idx + 1) % NUM_ERROR_SAMPLES;
@@ -144,8 +146,8 @@ void UpdateError(void) {
 
 void ResetError(void) {
     for (uint8_t i = 0; i < NUM_ERROR_SAMPLES; i++) {
-        yaw_error_buf[i] = UINT16_MAX;
-        height_error_buf[i] = UINT16_MAX;
+        yaw_error_buf[i] = yaw_tolerance;
+        height_error_buf[i] = height_tolerance;
     }
 }
 
@@ -154,7 +156,7 @@ bool HasReachedTargetYaw(void) {
     for (uint8_t i = 0; i < NUM_ERROR_SAMPLES; i++) {
         err_sum += yaw_error_buf[i];
     }
-    return !(err_sum > yaw_tolerance);
+    return err_sum <= yaw_tolerance;
 }
 
 bool HasReachedTargetHeight(void) {
@@ -162,14 +164,16 @@ bool HasReachedTargetHeight(void) {
     for (uint8_t i = 0; i < NUM_ERROR_SAMPLES; i++) {
         err_sum += height_error_buf[i];
     }
-    return !(err_sum > height_tolerance);
+    return err_sum <= height_tolerance;
 }
 
 void UpdateFlightMode() {
     static bool wait = false;
     static bool wait_2 = false;
+    static uint32_t elapsed_ticks = 0;
     bool event = GetSwitchEvent();
     uint8_t presses[4];
+
 	switch (flight_state) {
 
     case LANDED: {
@@ -211,6 +215,7 @@ void UpdateFlightMode() {
         }
         break;
     }
+
     case FLYING: {
         if (event == SWITCH_DOWN) {
             /*
@@ -261,11 +266,12 @@ void UpdateFlightMode() {
         }
         break;
     }
+
     case LANDING: {
         UpdateError();
-        uint32_t elapsed_ticks = 0;
         bool is_target_yaw_reached = HasReachedTargetYaw();
         bool is_target_height_reached = HasReachedTargetHeight();
+
         if (!wait) {
             /*
              * Wait until yaw is at closest reference.
@@ -278,8 +284,23 @@ void UpdateFlightMode() {
              * Reset the error mechanism used to detect if target yaw and height have been reached.
              */
             ResetError();
-        } else {
-            if (wait_2) {
+            elapsed_ticks = SchedulerTickCountGet();
+        } else if (!wait_2 && is_target_yaw_reached) {
+            /*
+             * Wait until all landing criteria are met.
+             */
+            wait_2 = true;
+        } else if (wait_2) {
+            if (is_target_yaw_reached && is_target_height_reached) {
+                wait = false;
+                wait_2 = false;
+                PwmDisable(MAIN_ROTOR);
+                PwmDisable(TAIL_ROTOR);
+                /*
+                 * Go to the LANDED state after disabling PWM
+                 */
+                flight_state = LANDED;
+            } else {
                 if (GetTargetHeight() > 0) {
                     if ((SchedulerElapsedTicksGet(elapsed_ticks) * (1000 / PWM_FREQUENCY))
                             >= RATE_OF_DESCENT) {
@@ -287,27 +308,26 @@ void UpdateFlightMode() {
                         SetTargetHeight(GetTargetHeight() - 1);
                     }
                 }
-                if (is_target_yaw_reached && is_target_height_reached) {
-                    wait = false;
-                    wait_2 = false;
-                    PwmDisable(MAIN_ROTOR);
-                    PwmDisable(TAIL_ROTOR);
-                    /*
-                     * Go to the LANDED state after disabling PWM
-                     */
-                    flight_state = LANDED;
-                }
-            } else if (is_target_yaw_reached) {
-                /*
-                 * Wait until all landing criteria are met.
-                 */
-                wait_2 = true;
-                elapsed_ticks = SchedulerTickCountGet();
             }
+        } else if (is_target_height_reached
+                && ((SchedulerElapsedTicksGet(elapsed_ticks) * (1000 / PWM_FREQUENCY)) > 10000)) {
+            /*
+             * If 10 seconds has elapsed since it reached target height go to LANDED state
+             * regardless of yaw.
+             */
+            wait = false;
+            wait_2 = false;
+            PwmDisable(MAIN_ROTOR);
+            PwmDisable(TAIL_ROTOR);
+            /*
+             * Go to the LANDED state after disabling PWM
+             */
+            flight_state = LANDED;
         }
         break;
     }
-	}
+
+    }
 }
 
 uint8_t GetFlightMode(void) {
