@@ -26,6 +26,13 @@ static bool ref_found = false;
 
 static const int8_t lookup_table[] = {0, -1, 1, 0, 1, 0, 0, -1, -1, 0, 0, 1, 0, 1, -1, 0};
 
+const char* const flight_mode_string[4] = {
+    "Landed",
+    "Init",
+    "Flying",
+    "Landing"
+};
+
 static void YawHandler(void) {
     static uint8_t state = 0;
     uint8_t previous_state = state;
@@ -37,10 +44,12 @@ static void YawHandler(void) {
 }
 
 static void YawRefHandler(void) {
-    GPIOIntDisable(YAW_REF_BASE, YAW_REF_PIN);
-    GPIOIntClear(YAW_REF_BASE, YAW_REF_PIN);
-    yaw = 0;
-    ref_found = true;
+    if (GPIOIntStatus(YAW_REF_BASE, YAW_REF_PIN) & YAW_REF_PIN) {
+        GPIOIntDisable(YAW_REF_BASE, YAW_REF_PIN);
+        GPIOIntClear(YAW_REF_BASE, YAW_REF_PIN);
+        yaw = 0;
+        ref_found = true;
+    }
 }
 
 void YawManagerInit(void) {
@@ -58,10 +67,10 @@ void YawManagerInit(void) {
     SysCtlPeripheralEnable(YAW_REF_PERIPH);
     GPIOPinTypeGPIOInput(YAW_REF_BASE, YAW_REF_PIN);
     GPIOPadConfigSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_STRENGTH_4MA,
-            GPIO_PIN_TYPE_STD_WPD);
+            GPIO_PIN_TYPE_STD_WPU);
     GPIODirModeSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_DIR_MODE_IN);
 
-    GPIOIntTypeSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_BOTH_EDGES);
+    GPIOIntTypeSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_RISING_EDGE);
     GPIOIntRegister(YAW_REF_BASE, YawRefHandler);
     GPIOIntClear(YAW_REF_BASE, YAW_REF_PIN);
     GPIOIntDisable(YAW_REF_BASE, YAW_REF_PIN);

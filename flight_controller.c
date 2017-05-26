@@ -50,11 +50,11 @@ bool HasReachedTargetHeight(void);
 /*
  * Acceptable tolerance for yaw error (rotation unit defined in YAW_FULL_ROTATION)
  */
-#define YAW_SAMPLE_TOLERANCE        2
+#define YAW_SAMPLE_TOLERANCE        3
 /*
  * Acceptable tolerance for height error (%)
  */
-#define HEIGHT_SAMPLE_TOLERANCE     1
+#define HEIGHT_SAMPLE_TOLERANCE     2
 /*
  * Number of samples to summate error over
  */

@@ -110,14 +110,14 @@ void UpdateSerial() {
     int32_t target_yaw = GetTargetYawDegrees();
     uint32_t duty_cycle_main = GetPwmDutyCycle(MAIN_ROTOR);
     uint32_t duty_cycle_tail = GetPwmDutyCycle(TAIL_ROTOR);
-    bool is_landed = GetFlightMode() == LANDED;
-    char *flight_mode = is_landed ? "Landed" : "Flying";
+    uint8_t flight_mode = GetFlightMode();
+    const char *flight_mode_text = flight_mode_string[flight_mode];
 
     UARTprintf("Alt: %d [%d]\n"
             "Yaw: %d [%d]\n"
             "Main: [%d] Tail: [%d]\n"
             "Mode: %s\n"
-            "\n", height, target_height, yaw, target_yaw, duty_cycle_main, duty_cycle_tail, flight_mode);
+            "\n", height, target_height, yaw, target_yaw, duty_cycle_main, duty_cycle_tail, flight_mode_text);
 }
 
 int main(void) {
