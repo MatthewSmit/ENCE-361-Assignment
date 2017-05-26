@@ -21,12 +21,12 @@
 #define YAW_REF_PIN             GPIO_PIN_4
 #define YAW_REF_INT             INT_GPIOC
 
-static int32_t yaw = 0;
+static volatile int32_t yaw = 0;
 static bool ref_found = false;
 
 static const int8_t lookup_table[] = {0, -1, 1, 0, 1, 0, 0, -1, -1, 0, 0, 1, 0, 1, -1, 0};
 
-static void YawHandler() {
+static void YawHandler(void) {
     static uint8_t state = 0;
     uint8_t previous_state = state;
     state = (uint8_t) GPIOPinRead(YAW_PERIPH_BASE, YAW_GPIO_PINS);
@@ -36,16 +36,14 @@ static void YawHandler() {
     yaw += lookup_table[state | (previous_state << 2)];
 }
 
-static void YawRefHandler() {
-    if (GPIOIntStatus(YAW_REF_BASE, YAW_REF_PIN) & YAW_REF_PIN) {
-        GPIOIntDisable(YAW_REF_BASE, YAW_REF_PIN);
-        GPIOIntClear(YAW_REF_BASE, YAW_REF_PIN);
-        yaw = 0;
-        ref_found = true;
-    }
+static void YawRefHandler(void) {
+    GPIOIntDisable(YAW_REF_BASE, YAW_REF_PIN);
+    GPIOIntClear(YAW_REF_BASE, YAW_REF_PIN);
+    yaw = 0;
+    ref_found = true;
 }
 
-void YawManagerInit() {
+void YawManagerInit(void) {
     SysCtlPeripheralEnable(YAW_PERIPH_GPIO);
     GPIOPinTypeGPIOInput(YAW_PERIPH_BASE, YAW_GPIO_PINS);
     GPIOPadConfigSet(YAW_PERIPH_BASE, YAW_GPIO_PINS, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPD);
@@ -63,22 +61,22 @@ void YawManagerInit() {
             GPIO_PIN_TYPE_STD_WPD);
     GPIODirModeSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_DIR_MODE_IN);
 
-    GPIOIntTypeSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_RISING_EDGE);
+    GPIOIntTypeSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_BOTH_EDGES);
     GPIOIntRegister(YAW_REF_BASE, YawRefHandler);
     GPIOIntClear(YAW_REF_BASE, YAW_REF_PIN);
     GPIOIntDisable(YAW_REF_BASE, YAW_REF_PIN);
     IntEnable(YAW_REF_INT);
 }
 
-void YawRefTrigger() {
+void YawRefTrigger(void) {
     GPIOIntEnable(YAW_REF_BASE, YAW_REF_PIN);
 }
 
-bool YawRefFound() {
+bool YawRefFound(void) {
     return ref_found;
 }
 
-int32_t GetYaw() {
+int32_t GetYaw(void) {
     return yaw;
 }
 
@@ -90,7 +88,7 @@ int32_t GetClosestYawRef(int32_t yaw) {
         return yaw - remainder;
 }
 
-int32_t GetYawDegrees() {
+int32_t GetYawDegrees(void) {
     int32_t degrees = yaw * 360 / YAW_FULL_ROTATION;
     return degrees;
 }

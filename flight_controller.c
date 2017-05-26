@@ -32,8 +32,8 @@ void PriorityTaskDisable(void);
 void PriorityTaskEnable(void);
 void UpdateError(void);
 void ResetError(void);
-bool IsYawErrorTolerance(void);
-bool IsHeightErrorTolerance(void);
+bool HasReachedTargetYaw(void);
+bool HasReachedTargetHeight(void);
 
 #define TIMER_PERIPH			SYSCTL_PERIPH_TIMER0
 #define TIMER_BASE				TIMER0_BASE
@@ -149,7 +149,7 @@ void ResetError(void) {
     }
 }
 
-bool IsYawErrorTolerance(void) {
+bool HasReachedTargetYaw(void) {
     uint16_t err_sum = 0;
     for (uint8_t i = 0; i < NUM_ERROR_SAMPLES; i++) {
         err_sum += yaw_error_buf[i];
@@ -157,7 +157,7 @@ bool IsYawErrorTolerance(void) {
     return !(err_sum > yaw_tolerance);
 }
 
-bool IsHeightErrorTolerance(void) {
+bool HasReachedTargetHeight(void) {
     uint16_t err_sum = 0;
     for (uint8_t i = 0; i < NUM_ERROR_SAMPLES; i++) {
         err_sum += height_error_buf[i];
@@ -174,85 +174,87 @@ void UpdateFlightMode() {
 
     case LANDED: {
         if (event == SWITCH_UP) {
-            //
-            // Go to INIT state
-            //
+            /*
+             * Go to INIT state
+             */
             flight_state = INIT;
         }
         break;
     }
     case INIT: {
-        //
-        // Ignore all switch events
-        //
         if (YawRefFound()) {
             wait = false;
-            //
-            // Go straight to FLYING state.
-            //
+            /*
+             * Before entering the FLYING state must enable PWM, clear the pid controllers, and
+             * enable the priority task scheduler.
+             */
             YawControllerInit();
             HeightControllerInit();
             PwmEnable(MAIN_ROTOR);
             PwmEnable(TAIL_ROTOR);
             PriorityTaskEnable();
             ResetPushes();
+            /*
+             * Go to the FLYING state
+             */
             flight_state = FLYING;
         } else if (!wait) {
             wait = true;
+            /*
+             * Trigger a height
+             */
             YawRefTrigger();
             ZeroHeightTrigger();
             PriorityTaskDisable();
-//            SetPwmDutyCycle(TAIL_ROTOR, 2);
             SetPwmDutyCycle(MAIN_ROTOR, 30);
-//            PwmEnable(TAIL_ROTOR);
             PwmEnable(MAIN_ROTOR);
         }
         break;
     }
     case FLYING: {
         if (event == SWITCH_DOWN) {
-            //
-            // Go to LANDING state
-            //
+            /*
+             * Go to LANDING state
+             */
             flight_state = LANDING;
         } else {
-            //
-            // Get all the button pushes.
-            //
+            /*
+             * Get all the button pushes
+             */
             for (uint8_t i = 0; i < NUM_BUTTONS; i++) {
                 presses[i] = NumPushes(i);
             }
 
             if (presses[BTN_UP] > 0) {
-                //
-                // Increase height
-                //
+                /*
+                 * Increase height
+                 */
                 target_height = GetTargetHeight() + presses[BTN_UP] * height_inc;
                 target_height = (target_height > height_max) ? height_max : target_height;
                 SetTargetHeight(target_height);
             }
 
             if (presses[BTN_DOWN] > 0) {
-                //
-                // Decrease height
-                //
+                /*
+                 * Decrease height
+                 */
                 target_height = GetTargetHeight() - presses[BTN_DOWN] * height_inc;
                 target_height = (target_height < height_min) ? height_min : target_height;
                 SetTargetHeight(target_height);
             }
 
             if (presses[BTN_LEFT] > 0) {
-                //
-                // Rotate counter-clockwise
-                //
+                /*
+                 * Rotate counter-clockwise
+                 */
                 target_yaw = GetTargetYawDegrees() - presses[BTN_LEFT] * yaw_inc;
                 SetTargetYawDegrees(target_yaw);
             }
 
             if (presses[BTN_RIGHT] > 0) {
-                //
-                // Rotate clockwise
-                //
+                /*
+                 * Rotate clockwise
+                 */
                 target_yaw = GetTargetYawDegrees() + presses[BTN_RIGHT] * yaw_inc;
                 SetTargetYawDegrees(target_yaw);
             }
@@ -262,12 +264,12 @@ void UpdateFlightMode() {
     case LANDING: {
         UpdateError();
         uint32_t elapsed_ticks = 0;
-        bool is_yaw_target_reached = IsYawErrorTolerance();
-        bool is_height_target_reached = IsHeightErrorTolerance();
+        bool is_target_yaw_reached = HasReachedTargetYaw();
+        bool is_target_height_reached = HasReachedTargetHeight();
         if (!wait) {
-            //
-            // Wait until yaw is at closest reference.
-            //
+            /*
+             * Wait until yaw is at closest reference.
+             */
             wait = true;
             int32_t yaw_ref = GetClosestYawRef(target_yaw);
             SetTargetYaw(yaw_ref);
@@ -285,14 +287,17 @@ void UpdateFlightMode() {
                         SetTargetHeight(GetTargetHeight() - 1);
                     }
                 }
-                if (is_yaw_target_reached && is_height_target_reached) {
+                if (is_target_yaw_reached && is_target_height_reached) {
                     wait = false;
                     wait_2 = false;
                     PwmDisable(MAIN_ROTOR);
                     PwmDisable(TAIL_ROTOR);
+                    /*
+                     * Go to the LANDED state after disabling PWM
+                     */
                     flight_state = LANDED;
                 }
-            } else if (is_yaw_target_reached) {
+            } else if (is_target_yaw_reached) {
                 /*
                  * Wait until all landing criteria are met.
                  */
