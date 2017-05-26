@@ -1,8 +1,9 @@
-/*
- * pid.c
+/**
+ * @file pid.c
+ * @date
+ * @brief A generic pid controller module.
  *
- *  Created on: 19/05/2017
- *      Author: daniel
+ *
  */
 
 #include "stdint.h"
@@ -16,13 +17,12 @@ void PidInit(PidState *state) {
 int32_t UpdatePid(PidState *state, int32_t error, uint32_t delta_t, double proportional_gain, double integral_gain,
         double derivative_gain) {
 
-    state->error_integrated += error * (int32_t) delta_t;
+    state->error_integrated += (int32_t) delta_t * error;
     int32_t error_integrated = state->error_integrated;
-    double error_derivative = (double) (error - state->error_previous) / (double) delta_t;
+    double error_derivative = (double) (error - state->error_previous) / delta_t;
 
     state->error_previous = error;
 
-    int32_t control = (double) error * proportional_gain + (double) error_integrated * integral_gain
-            + (double) error_derivative * derivative_gain;
+    int32_t control = error * proportional_gain + error_integrated * integral_gain + error_derivative * derivative_gain;
     return control;
 }

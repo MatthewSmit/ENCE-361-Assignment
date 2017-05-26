@@ -10,6 +10,7 @@
 #include "inc/hw_ints.h"
 #include "inc/hw_timer.h"
 #include "inc/hw_memmap.h"
+#include "driverlib/debug.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/interrupt.h"
 #include "driverlib/timer.h"
@@ -25,6 +26,15 @@
 #include "height.h"
 #include "flight_controller.h"
 
+void TimerInit(void);
+void TimerHandler(void);
+void PriorityTaskDisable(void);
+void PriorityTaskEnable(void);
+void UpdateError(void);
+void ResetError(void);
+bool IsYawErrorTolerance(void);
+bool IsHeightErrorTolerance(void);
+
 #define TIMER_PERIPH			SYSCTL_PERIPH_TIMER0
 #define TIMER_BASE				TIMER0_BASE
 #define TIMER_CONFIG			TIMER_CFG_PERIODIC
@@ -32,16 +42,39 @@
 #define TIMER_TIMEOUT			TIMER_TIMA_TIMEOUT
 #define TIMER_INT				INT_TIMER0A
 
-#define RATE_OF_DESCENT			30 // Rate of descent (ms per decrement of duty cycle)
-#define YAW_BUFFER_SIZE         5
+/*
+ * Rate of descent (ms per decrement of duty cycle)
+ */
+#define RATE_OF_DESCENT			    35
+/*
+ * Acceptable tolerance for yaw error (rotation unit defined in YAW_FULL_ROTATION)
+ */
+#define YAW_SAMPLE_TOLERANCE        2
+/*
+ * Acceptable tolerance for height error (%)
+ */
+#define HEIGHT_SAMPLE_TOLERANCE     1
+/*
+ * Number of samples to summate error over
+ */
+#define NUM_ERROR_SAMPLES             5
 
 static const uint8_t height_inc = 10;
 static const uint8_t height_min = 0;
 static const uint8_t height_max = 100;
 static const uint8_t yaw_inc = 15;
 
-static uint16_t yaw_difference_buffer[YAW_BUFFER_SIZE];
-static uint32_t yaw_difference_ptr;
+/*
+ * Tolerance to ascertain if yaw has reached target yaw. Rounded up.
+ */
+static uint16_t const yaw_tolerance = (uint16_t) (YAW_SAMPLE_TOLERANCE * NUM_ERROR_SAMPLES);
+static uint16_t yaw_error_buf[NUM_ERROR_SAMPLES];
+
+/*
+ * Tolerance to ascertain if height has reached target height. Rounded up.
+ */
+static uint16_t const height_tolerance = (uint16_t) (HEIGHT_SAMPLE_TOLERANCE * NUM_ERROR_SAMPLES);
+static uint16_t height_error_buf[NUM_ERROR_SAMPLES];
 
 static uint8_t flight_state;
 static int32_t target_yaw;
@@ -100,6 +133,38 @@ void FlightControllerInit(void) {
     PriorityTaskInit();
 }
 
+void UpdateError(void) {
+    static uint32_t idx = 0;
+    uint16_t yaw_sample_err = (uint16_t) abs(GetYaw() - GetTargetYaw());
+    uint16_t height_sample_err = (uint16_t) abs(GetHeight() - (int32_t) GetTargetHeight());
+    yaw_error_buf[idx] = yaw_sample_err;
+    height_error_buf[idx] = height_sample_err;
+    idx = (idx + 1) % NUM_ERROR_SAMPLES;
+}
+
+void ResetError(void) {
+    for (uint8_t i = 0; i < NUM_ERROR_SAMPLES; i++) {
+        yaw_error_buf[i] = UINT16_MAX;
+        height_error_buf[i] = UINT16_MAX;
+    }
+}
+
+bool IsYawErrorTolerance(void) {
+    uint16_t err_sum = 0;
+    for (uint8_t i = 0; i < NUM_ERROR_SAMPLES; i++) {
+        err_sum += yaw_error_buf[i];
+    }
+    return !(err_sum > yaw_tolerance);
+}
+
+bool IsHeightErrorTolerance(void) {
+    uint16_t err_sum = 0;
+    for (uint8_t i = 0; i < NUM_ERROR_SAMPLES; i++) {
+        err_sum += height_error_buf[i];
+    }
+    return !(err_sum > height_tolerance);
+}
+
 void UpdateFlightMode() {
     static bool wait = false;
     static bool wait_2 = false;
@@ -107,16 +172,16 @@ void UpdateFlightMode() {
     uint8_t presses[4];
 	switch (flight_state) {
 
-	case LANDED:
+    case LANDED: {
         if (event == SWITCH_UP) {
             //
             // Go to INIT state
             //
             flight_state = INIT;
         }
-		break;
-
-	case INIT:
+        break;
+    }
+    case INIT: {
         //
         // Ignore all switch events
         //
@@ -143,8 +208,8 @@ void UpdateFlightMode() {
             PwmEnable(MAIN_ROTOR);
         }
         break;
-
-	case FLYING:
+    }
+    case FLYING: {
         if (event == SWITCH_DOWN) {
             //
             // Go to LANDING state
@@ -162,11 +227,8 @@ void UpdateFlightMode() {
                 //
                 // Increase height
                 //
-                target_height = GetTargetHeight()
-                        + presses[BTN_UP] * height_inc;
-                target_height =
-                        (target_height > height_max) ?
-                                height_max : target_height;
+                target_height = GetTargetHeight() + presses[BTN_UP] * height_inc;
+                target_height = (target_height > height_max) ? height_max : target_height;
                 SetTargetHeight(target_height);
             }
 
@@ -174,11 +236,8 @@ void UpdateFlightMode() {
                 //
                 // Decrease height
                 //
-                target_height = GetTargetHeight()
-                        - presses[BTN_DOWN] * height_inc;
-                target_height =
-                        (target_height < height_min) ?
-                                height_min : target_height;
+                target_height = GetTargetHeight() - presses[BTN_DOWN] * height_inc;
+                target_height = (target_height < height_min) ? height_min : target_height;
                 SetTargetHeight(target_height);
             }
 
@@ -198,11 +257,13 @@ void UpdateFlightMode() {
                 SetTargetYawDegrees(target_yaw);
             }
         }
-		break;
-
-	case LANDING:
-        target_yaw = GetTargetYaw();
+        break;
+    }
+    case LANDING: {
+        UpdateError();
         uint32_t elapsed_ticks = 0;
+        bool is_yaw_target_reached = IsYawErrorTolerance();
+        bool is_height_target_reached = IsHeightErrorTolerance();
         if (!wait) {
             //
             // Wait until yaw is at closest reference.
@@ -211,50 +272,36 @@ void UpdateFlightMode() {
             int32_t yaw_ref = GetClosestYawRef(target_yaw);
             SetTargetYaw(yaw_ref);
 
-            for (uint32_t i = 0; i < YAW_BUFFER_SIZE; i++) {
-                yaw_difference_buffer[i] = 0xFFFF;
-            }
-            yaw_difference_ptr = 0;
+            /*
+             * Reset the error mechanism used to detect if target yaw and height have been reached.
+             */
+            ResetError();
         } else {
-            //
-            // Get the absolute difference between target and actual yaw, then add it to a buffer.
-            //
-            uint16_t yaw_difference = abs(GetYaw() - GetTargetYaw());
-            yaw_difference_buffer[yaw_difference_ptr] = yaw_difference;
-            yaw_difference_ptr = (yaw_difference_ptr + 1) % YAW_BUFFER_SIZE;
-
-            //
-            // Calculate the sum of the yaw differences over the past YAW_BUFFER_SIZE updates.
-            //
-            uint32_t yaw_difference_sum = 0;
-            for (uint32_t i = 0; i < YAW_BUFFER_SIZE; i++) {
-                yaw_difference_sum += yaw_difference_buffer[i];
-            }
-
             if (wait_2) {
                 if (GetTargetHeight() > 0) {
-                    if ((SchedulerElapsedTicksGet(elapsed_ticks) * (1000 / PWM_FREQUENCY)) >= RATE_OF_DESCENT) {
+                    if ((SchedulerElapsedTicksGet(elapsed_ticks) * (1000 / PWM_FREQUENCY))
+                            >= RATE_OF_DESCENT) {
                         elapsed_ticks = SchedulerTickCountGet();
                         SetTargetHeight(GetTargetHeight() - 1);
                     }
                 }
-                if ((yaw_difference <= 10)
-                        && (GetHeight() == GetTargetHeight())) {
+                if (is_yaw_target_reached && is_height_target_reached) {
                     wait = false;
                     wait_2 = false;
                     PwmDisable(MAIN_ROTOR);
                     PwmDisable(TAIL_ROTOR);
                     flight_state = LANDED;
                 }
-            } else if (!wait_2 && yaw_difference <= 10) {
-                //
-                // Wait until all landing criteria are met.
-                //
+            } else if (is_yaw_target_reached) {
+                /*
+                 * Wait until all landing criteria are met.
+                 */
                 wait_2 = true;
                 elapsed_ticks = SchedulerTickCountGet();
             }
         }
-		break;
+        break;
+    }
 	}
 }
 
