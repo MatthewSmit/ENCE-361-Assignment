@@ -80,7 +80,7 @@ void ZeroHeightTrigger(void) {
 
 int32_t GetHeight() {
     if (ref_found) {
-        return zero_reading - adc_val;
+        return (int32_t) zero_reading - adc_val;
     } else {
         return 0;
     }

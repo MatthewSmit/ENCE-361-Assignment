@@ -58,7 +58,7 @@ bool HasReachedTargetHeight(void);
 /*
  * Number of samples to summate error over
  */
-#define NUM_ERROR_SAMPLES             5
+#define NUM_ERROR_SAMPLES           5
 
 static const uint8_t height_inc = 10;
 static const uint8_t height_min = 0;
@@ -66,13 +66,13 @@ static const uint8_t height_max = 100;
 static const uint8_t yaw_inc = 15;
 
 /*
- * Tolerance to ascertain if yaw has reached target yaw. Rounded up.
+ * Tolerance to ascertain if yaw has reached target yaw.
  */
 static const uint16_t yaw_tolerance = YAW_SAMPLE_TOLERANCE * NUM_ERROR_SAMPLES;
 static uint16_t yaw_error_buf[NUM_ERROR_SAMPLES];
 
 /*
- * Tolerance to ascertain if height has reached target height. Rounded up.
+ * Tolerance to ascertain if height has reached target height.
  */
 static const uint16_t height_tolerance = HEIGHT_SAMPLE_TOLERANCE * NUM_ERROR_SAMPLES;
 static uint16_t height_error_buf[NUM_ERROR_SAMPLES];
@@ -138,7 +138,7 @@ void FlightControllerInit(void) {
 void UpdateError(void) {
     static uint32_t idx = 0;
     uint16_t yaw_sample_err = abs(GetYaw() - GetTargetYaw());
-    uint16_t height_sample_err = abs(GetHeight() - (int32_t) GetTargetHeight());
+    uint16_t height_sample_err = abs(GetHeight() - GetTargetHeight());
     yaw_error_buf[idx] = yaw_sample_err;
     height_error_buf[idx] = height_sample_err;
     idx = (idx + 1) % NUM_ERROR_SAMPLES;
@@ -204,9 +204,6 @@ void UpdateFlightMode() {
             flight_state = FLYING;
         } else if (!wait) {
             wait = true;
-            /*
-             * Trigger a height
-             */
             YawRefTrigger();
             ZeroHeightTrigger();
             PriorityTaskDisable();
@@ -248,20 +245,25 @@ void UpdateFlightMode() {
                 SetTargetHeight(target_height);
             }
 
-            if (presses[BTN_LEFT] > 0) {
-                /*
-                 * Rotate counter-clockwise
-                 */
-                target_yaw = GetTargetYawDegrees() - presses[BTN_LEFT] * yaw_inc;
-                SetTargetYawDegrees(target_yaw);
-            }
+            /*
+             * Ignore yaw commands if the helicopter is at 0 height
+             */
+            if (target_height > 0) {
+                if (presses[BTN_LEFT] > 0) {
+                    /*
+                     * Rotate counter-clockwise
+                     */
+                    target_yaw = GetTargetYawDegrees() - presses[BTN_LEFT] * yaw_inc;
+                    SetTargetYawDegrees(target_yaw);
+                }
 
-            if (presses[BTN_RIGHT] > 0) {
-                /*
-                 * Rotate clockwise
-                 */
-                target_yaw = GetTargetYawDegrees() + presses[BTN_RIGHT] * yaw_inc;
-                SetTargetYawDegrees(target_yaw);
+                if (presses[BTN_RIGHT] > 0) {
+                    /*
+                     * Rotate clockwise
+                     */
+                    target_yaw = GetTargetYawDegrees() + presses[BTN_RIGHT] * yaw_inc;
+                    SetTargetYawDegrees(target_yaw);
+                }
             }
         }
         break;

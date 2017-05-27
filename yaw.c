@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "inc/hw_ints.h"
 #include "inc/hw_memmap.h"
-#include "inc/tm4c123gh6pm.h"
 #include "driverlib/gpio.h"
 #include "driverlib/interrupt.h"
 #include "driverlib/sysctl.h"
@@ -37,16 +37,21 @@ static void YawHandler(void) {
 }
 
 static void YawRefHandler(void) {
-    GPIOIntDisable(YAW_REF_BASE, YAW_REF_PIN);
-    GPIOIntClear(YAW_REF_BASE, YAW_REF_PIN);
-    yaw = 0;
-    ref_found = true;
+    /*
+     * If the interrupt was caused by the reference signal.
+     */
+    if (GPIOIntStatus(YAW_REF_BASE, false) && YAW_REF_PIN) {
+        GPIOIntDisable(YAW_REF_BASE, YAW_REF_PIN);
+        GPIOIntClear(YAW_REF_BASE, YAW_REF_PIN);
+        yaw = 0;
+        ref_found = true;
+    }
 }
 
 void YawManagerInit(void) {
     SysCtlPeripheralEnable(YAW_PERIPH_GPIO);
     GPIOPinTypeGPIOInput(YAW_PERIPH_BASE, YAW_GPIO_PINS);
-    GPIOPadConfigSet(YAW_PERIPH_BASE, YAW_GPIO_PINS, GPIO_STRENGTH_4MA, GPIO_PIN_TYPE_STD_WPD);
+    GPIOPadConfigSet(YAW_PERIPH_BASE, YAW_GPIO_PINS, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPD);
     GPIODirModeSet(YAW_PERIPH_BASE, YAW_GPIO_PINS, GPIO_DIR_MODE_IN);
 
     GPIOIntTypeSet(YAW_PERIPH_BASE, YAW_GPIO_PINS, GPIO_BOTH_EDGES);
@@ -57,8 +62,7 @@ void YawManagerInit(void) {
 
     SysCtlPeripheralEnable(YAW_REF_PERIPH);
     GPIOPinTypeGPIOInput(YAW_REF_BASE, YAW_REF_PIN);
-    GPIOPadConfigSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_STRENGTH_4MA,
-            GPIO_PIN_TYPE_STD_WPD);
+    GPIOPadConfigSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
     GPIODirModeSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_DIR_MODE_IN);
 
     GPIOIntTypeSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_BOTH_EDGES);
