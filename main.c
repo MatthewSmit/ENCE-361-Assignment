@@ -4,32 +4,26 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include "inc/hw_ints.h"
-#include "inc/hw_memmap.h"
-#include "inc/hw_types.h"
-#include "driverlib/adc.h"
-#include "driverlib/debug.h"
+
 #include "driverlib/fpu.h"
-#include "driverlib/gpio.h"
 #include "driverlib/interrupt.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/systick.h"
-#include "driverlib/timer.h"
-#include "driverlib/uart.h"
+#include "utils/scheduler.h"
 #include "utils/uartstdio.h"
 #include "utils/ustdlib.h"
-#include "utils/scheduler.h"
 
 #include "buttons.h"
-#include "height_controller.h"
-#include "oled_interface.h"
-#include "reset.h"
-#include "serial_interface.h"
-#include "yaw_controller.h"
 #include "flight_controller.h"
 #include "height.h"
-#include "yaw.h"
+#include "height_controller.h"
+#include "oled_interface.h"
+#include "pwm_output.h"
+#include "reset.h"
+#include "serial_interface.h"
 #include "switch.h"
+#include "yaw.h"
+#include "yaw_controller.h"
 
 #ifdef DEBUG
 void __error__(char *pcFilename, uint32_t ui32Line) {

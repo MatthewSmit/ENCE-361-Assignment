@@ -8,8 +8,6 @@
 #ifndef PID_H_
 #define PID_H_
 
-#include "stdint.h"
-
 typedef struct {
     int32_t error_previous;
     int32_t error_integrated;

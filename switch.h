@@ -1,5 +1,5 @@
-/*
- * @file buttons.c
+/**
+ * @file switch.h
  *
  * @author Matthew Smit
  * @date 2017-05-20
@@ -8,7 +8,9 @@
 #ifndef SWITCH_H_
 #define SWITCH_H_
 
-/* State changes only after so many consecutive readings have an opposite value */
+/*
+ * State changes only after so many consecutive readings have an opposite value
+ */
 #define NUM_POLLS 5
 
 enum {
@@ -18,10 +20,10 @@ enum {
 /**
  * Initialise the switch.
  */
-void SwitchInit();
+void SwitchInit(void);
 
 /**
- * Update the switch state. This code is fast enough to be run in an ISR.
+ * Update the switch state.
  */
 void UpdateSwitch();
 
@@ -30,6 +32,6 @@ void UpdateSwitch();
  *
  * @return DOWN or UP slide of the switch.
  */
-uint8_t GetSwitchEvent();
+uint8_t GetSwitchEvent(void);
 
 #endif /* SWITCH_H_ */

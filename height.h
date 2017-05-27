@@ -1,5 +1,5 @@
 /**
- * @file heighManager.h
+ * @file height.h
  */
 
 #ifndef HEIGHT_H_

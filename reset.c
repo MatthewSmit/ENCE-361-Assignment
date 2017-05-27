@@ -8,16 +8,13 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "reset.h"
-
-#include "serial_interface.h"
-
+#include "inc/hw_ints.h"
+#include "inc/hw_memmap.h"
 #include "driverlib/gpio.h"
 #include "driverlib/interrupt.h"
 #include "driverlib/sysctl.h"
-#include "inc/hw_memmap.h"
-#include "inc/tm4c123gh6pm.h"
-#include "utils/uartstdio.h"
+
+#include "reset.h"
 
 #define RESET_PERIPH_GPIO       SYSCTL_PERIPH_GPIOA
 #define RESET_PERIPH_BASE       GPIO_PORTA_BASE

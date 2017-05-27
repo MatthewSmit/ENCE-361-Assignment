@@ -4,9 +4,9 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "utils/uartstdio.h"
-#include "driverlib/debug.h"
 
+#include "pid.h"
+#include "pwm_output.h"
 #include "yaw.h"
 #include "yaw_controller.h"
 
@@ -61,9 +61,9 @@ void UpdateYawController(uint32_t delta_t) {
     SetPwmDutyCycle(TAIL_ROTOR, control);
 }
 
-void TuneParamTailRotor(double my_k_p, double my_k_i, double my_k_d) {
-    proportional_gain = my_k_p;
-    integral_gain = my_k_i;
-    derivative_gain = my_k_d;
+void TuneProportionalTailRotor(double gain) {
+    proportional_gain = gain;
+    integral_gain = 0.0;
+    derivative_gain = 0.0;
 }
 

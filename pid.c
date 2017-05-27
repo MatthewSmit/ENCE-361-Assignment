@@ -6,7 +6,8 @@
  *
  */
 
-#include "stdint.h"
+#include <stdint.h>
+
 #include "pid.h"
 
 void PidInit(PidState *state) {

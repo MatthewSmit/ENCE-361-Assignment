@@ -4,28 +4,24 @@
  *  Created on: May 22, 2017
  *      Author: dpv11
  */
-#include "stdint.h"
-#include "stdbool.h"
+#include <stdbool.h>
+#include <stdint.h>
 
 #include "inc/hw_ints.h"
-#include "inc/hw_timer.h"
 #include "inc/hw_memmap.h"
-#include "driverlib/debug.h"
-#include "driverlib/sysctl.h"
 #include "driverlib/interrupt.h"
+#include "driverlib/sysctl.h"
 #include "driverlib/timer.h"
 #include "utils/scheduler.h"
-#include "utils/uartstdio.h"
 
 #include "buttons.h"
-#include "pwm_output.h"
-#include "yaw_controller.h"
-#include "height_controller.h"
-#include "switch.h"
-#include "buttons.h"
-#include "yaw.h"
-#include "height.h"
 #include "flight_controller.h"
+#include "height.h"
+#include "height_controller.h"
+#include "pwm_output.h"
+#include "switch.h"
+#include "yaw.h"
+#include "yaw_controller.h"
 
 void TimerInit(void);
 void TimerHandler(void);
@@ -294,7 +290,7 @@ void UpdateFlightMode() {
         } else {
             if (GetTargetHeight() == 0) {
                 /*
-                 * If 10 seconds has elapsed since it reached target height go to LANDED state
+                 * If 10 seconds have elapsed since it reached target height go to LANDED state
                  * regardless of yaw.
                  */
                 if (is_target_height_reached

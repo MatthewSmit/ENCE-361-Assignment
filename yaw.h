@@ -1,3 +1,7 @@
+/**
+ * @file yaw.h
+ */
+
 #ifndef YAW_H_
 #define YAW_H_
 
@@ -11,4 +15,4 @@ int32_t GetClosestYawRef(int32_t yaw);
 void YawRefTrigger(void);
 bool YawRefFound(void);
 
-#endif
+#endif /* YAW_H_ */

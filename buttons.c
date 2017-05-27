@@ -5,16 +5,14 @@
  * @date 25.03.2017
  */
 
-#include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "inc/hw_ints.h"
 #include "inc/hw_gpio.h"
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
-#include "driverlib/interrupt.h"
 #include "driverlib/gpio.h"
+#include "driverlib/interrupt.h"
 #include "driverlib/sysctl.h"
 
 #include "buttons.h"
