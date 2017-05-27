@@ -76,8 +76,6 @@ static uint16_t height_error_buf[NUM_ERROR_SAMPLES];
 
 static const char* flight_mode[] = { "Landed", "Init", "Flying", "Landing" };
 static uint8_t flight_state;
-static int32_t target_yaw;
-static int32_t target_height;
 
 void TimerHandler(void) {
     TimerIntClear(TIMER_BASE, TIMER_TIMEOUT);
@@ -171,6 +169,8 @@ void UpdateFlightMode() {
     static uint32_t elapsed_ticks = 0;
     bool event = GetSwitchEvent();
     uint8_t presses[4];
+    int32_t target_yaw;
+    int32_t target_height;
 
 	switch (flight_state) {
 
@@ -253,7 +253,7 @@ void UpdateFlightMode() {
             /*
              * Ignore yaw commands if the helicopter is at 0 height
              */
-            if (target_height > 0) {
+            if (GetTargetHeight() > 0) {
                 /*
                  * Rotate counter-clockwise
                  */
