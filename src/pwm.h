@@ -1,12 +1,12 @@
 /**
- * @file pwm_manager.h
+ * @file pwm.h
  *
  * @author Daniel van Wichen
  * @date 25.03.2017
  */
 
-#ifndef PWM_OUTPUT_H_
-#define PWM_OUTPUT_H_
+#ifndef PWM_H_
+#define PWM_H_
 
 #define PWM_FREQUENCY 200
 
@@ -18,4 +18,4 @@ uint32_t GetPwmDutyCycle(uint8_t pwm_output);
 void PwmDisable(uint8_t pwm_output);
 void PwmEnable(uint8_t pwm_output);
 
-#endif
+#endif /* PWM_H_ */

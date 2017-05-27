@@ -12,7 +12,8 @@
 #include "driverlib/pwm.h"
 #include "driverlib/sysctl.h"
 
-#include "pwm_output.h"
+#include "pwm.h"
+
 
 /* PWM Main Rotor Definitions */
 #define PWM_MAIN_BASE           PWM0_BASE

@@ -18,7 +18,7 @@
 #include "flight_controller.h"
 #include "height.h"
 #include "height_controller.h"
-#include "pwm_output.h"
+#include "pwm.h"
 #include "switch.h"
 #include "yaw.h"
 #include "yaw_controller.h"

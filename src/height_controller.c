@@ -11,7 +11,7 @@
 #include "height.h"
 #include "height_controller.h"
 #include "pid.h"
-#include "pwm_output.h"
+#include "pwm.h"
 
 static const double ultimate_gain = 1.0;
 static const double period = 700.0;

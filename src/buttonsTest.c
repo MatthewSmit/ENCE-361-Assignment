@@ -19,7 +19,7 @@
 #include "driverlib/sysctl.h"
 #include "driverlib/systick.h"
 
-#include "OrbitOLEDInterface.h"
+#include "oled_interface.h"
 
 #include "buttons.h"
 

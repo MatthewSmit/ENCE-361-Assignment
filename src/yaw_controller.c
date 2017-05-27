@@ -6,7 +6,7 @@
 #include <stdint.h>
 
 #include "pid.h"
-#include "pwm_output.h"
+#include "pwm.h"
 #include "yaw.h"
 #include "yaw_controller.h"
 

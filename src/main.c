@@ -18,7 +18,7 @@
 #include "height.h"
 #include "height_controller.h"
 #include "oled_interface.h"
-#include "pwm_output.h"
+#include "pwm.h"
 #include "reset.h"
 #include "serial_interface.h"
 #include "switch.h"
