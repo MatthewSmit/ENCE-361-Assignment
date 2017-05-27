@@ -275,8 +275,6 @@ void UpdateFlightMode() {
         bool is_target_height_reached = HasReachedTargetHeight();
         bool is_target_yaw_reached = HasReachedTargetYaw();
 
-        UARTprintf("TH: %d TY: %d\n", is_target_height_reached, is_target_yaw_reached);
-
         if (!wait) {
             /*
              * Wait until yaw is at closest reference.
