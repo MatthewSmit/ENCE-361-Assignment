@@ -14,6 +14,7 @@ void SetTargetYawDegrees(int32_t yaw);
 int32_t GetTargetYaw(void);
 void SetTargetYaw(int32_t yaw);
 void YawControllerInit(void);
+void PreloadYawController(int32_t control, int32_t error);
 void UpdateYawController(uint32_t delta_t);
 
 void TuneProportionalTailRotor(double gain);

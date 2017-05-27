@@ -225,19 +225,26 @@ void UpdateFlightMode() {
                 presses[i] = NumPushes(i);
             }
 
+            /*
+             * Increase height
+             */
             if (presses[BTN_UP] > 0) {
                 /*
-                 * Increase height
+                 * If the helicopter is set to be at zero height, preload the integral
+                 * so the rise time is less long.
                  */
+                if (GetTargetHeight() == 0) {
+                    PreloadHeightController(20, height_inc);
+                }
                 target_height = GetTargetHeight() + presses[BTN_UP] * height_inc;
                 target_height = (target_height > height_max) ? height_max : target_height;
                 SetTargetHeight(target_height);
             }
 
+            /*
+             * Decrease height
+             */
             if (presses[BTN_DOWN] > 0) {
-                /*
-                 * Decrease height
-                 */
                 target_height = GetTargetHeight() - presses[BTN_DOWN] * height_inc;
                 target_height = (target_height < height_min) ? height_min : target_height;
                 SetTargetHeight(target_height);
@@ -247,18 +254,18 @@ void UpdateFlightMode() {
              * Ignore yaw commands if the helicopter is at 0 height
              */
             if (target_height > 0) {
+                /*
+                 * Rotate counter-clockwise
+                 */
                 if (presses[BTN_LEFT] > 0) {
-                    /*
-                     * Rotate counter-clockwise
-                     */
                     target_yaw = GetTargetYawDegrees() - presses[BTN_LEFT] * yaw_inc;
                     SetTargetYawDegrees(target_yaw);
                 }
 
+                /*
+                 * Rotate clockwise
+                 */
                 if (presses[BTN_RIGHT] > 0) {
-                    /*
-                     * Rotate clockwise
-                     */
                     target_yaw = GetTargetYawDegrees() + presses[BTN_RIGHT] * yaw_inc;
                     SetTargetYawDegrees(target_yaw);
                 }

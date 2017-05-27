@@ -15,6 +15,11 @@ void PidInit(PidState *state) {
     state->error_integrated = 0;
 }
 
+void PreloadPid(PidState *state, int32_t integral_preload) {
+    state->error_previous = 0;
+    state->error_integrated = integral_preload;
+}
+
 int32_t UpdatePid(PidState *state, int32_t error, uint32_t delta_t, double proportional_gain, double integral_gain,
         double derivative_gain) {
 

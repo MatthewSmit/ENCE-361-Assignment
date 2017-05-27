@@ -61,6 +61,12 @@ void UpdateYawController(uint32_t delta_t) {
     SetPwmDutyCycle(TAIL_ROTOR, control);
 }
 
+void PreloadYawController(int32_t control, int32_t error) {
+    double proportional_control = error * proportional_gain;
+    int32_t integral_preload = (control - proportional_control) / integral_gain;
+    PreloadPid(&yaw_state, integral_preload);
+}
+
 void TuneProportionalTailRotor(double gain) {
     proportional_gain = gain;
     integral_gain = 0.0;

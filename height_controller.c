@@ -57,6 +57,12 @@ void UpdateHeightController(uint32_t delta_t) {
     SetPwmDutyCycle(MAIN_ROTOR, control);
 }
 
+void PreloadHeightController(int32_t control, int32_t error) {
+    double proportional_control = error * proportional_gain;
+    int32_t integral_preload = (control - proportional_control) / integral_gain;
+    PreloadPid(&height_state, integral_preload);
+}
+
 void TuneProportionalMainRotor(double gain) {
     proportional_gain = proportional_gain;
     integral_gain = 0.0;
