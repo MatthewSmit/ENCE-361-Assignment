@@ -5,16 +5,14 @@
  * @date 25.03.2017
  */
 
-#include <stdio.h>
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "inc/hw_ints.h"
 #include "inc/hw_gpio.h"
 #include "inc/hw_memmap.h"
 #include "inc/hw_types.h"
-#include "driverlib/interrupt.h"
 #include "driverlib/gpio.h"
+#include "driverlib/interrupt.h"
 #include "driverlib/sysctl.h"
 
 #include "buttons.h"
@@ -48,23 +46,20 @@ static bool current_state[NUM_BUTTONS];
 static uint16_t count[NUM_BUTTONS];
 static uint8_t pushes[NUM_BUTTONS];
 
-void ButtonsInit() {
+void ButtonsInit(void) {
     /* UP and DOWN buttons are active high (default low) so are configured as pull down. */
     SysCtlPeripheralEnable(BTN_UP_PERIPH);
     GPIOPinTypeGPIOInput(BTN_UP_BASE, BTN_UP_PIN);
-    GPIOPadConfigSet(BTN_UP_BASE, BTN_UP_PIN, GPIO_STRENGTH_2MA,
-            GPIO_PIN_TYPE_STD_WPD);
+    GPIOPadConfigSet(BTN_UP_BASE, BTN_UP_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPD);
 
     SysCtlPeripheralEnable(BTN_DOWN_PERIPH);
     GPIOPinTypeGPIOInput(BTN_DOWN_BASE, BTN_DOWN_PIN);
-    GPIOPadConfigSet(BTN_DOWN_BASE, BTN_DOWN_PIN, GPIO_STRENGTH_2MA,
-            GPIO_PIN_TYPE_STD_WPD);
+    GPIOPadConfigSet(BTN_DOWN_BASE, BTN_DOWN_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPD);
 
     /* LEFT and RIGHT buttons are active low (default high) so are configured as pull up. */
     SysCtlPeripheralEnable(BTN_LEFT_PERIPH);
     GPIOPinTypeGPIOInput(BTN_LEFT_BASE, BTN_LEFT_PIN);
-    GPIOPadConfigSet(BTN_LEFT_BASE, BTN_LEFT_PIN, GPIO_STRENGTH_2MA,
-            GPIO_PIN_TYPE_STD_WPU);
+    GPIOPadConfigSet(BTN_LEFT_BASE, BTN_LEFT_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
 
     /* Unlock PF0 so we can change it to a GPIO input
      Once we have enabled (unlocked) the commit register then re-lock it
@@ -75,8 +70,7 @@ void ButtonsInit() {
 
     SysCtlPeripheralEnable(BTN_RIGHT_PERIPH);
     GPIOPinTypeGPIOInput(BTN_RIGHT_BASE, BTN_RIGHT_PIN);
-    GPIOPadConfigSet(BTN_RIGHT_BASE, BTN_RIGHT_PIN, GPIO_STRENGTH_2MA,
-            GPIO_PIN_TYPE_STD_WPU);
+    GPIOPadConfigSet(BTN_RIGHT_BASE, BTN_RIGHT_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
 
     /* Setup the default states of the buttons */
     default_state[BTN_UP] = BTN_UP_DEFAULT;
@@ -85,7 +79,7 @@ void ButtonsInit() {
     default_state[BTN_RIGHT] = BTN_RIGHT_DEFAULT;
 
     /* Reset other variables */
-    for (int i = 0; i < NUM_BUTTONS; i++) {
+    for (uint8_t i = 0; i < NUM_BUTTONS; i++) {
         current_state[i] = default_state[i];
         count[i] = 0;
         pushes[i] = 0;
@@ -94,10 +88,11 @@ void ButtonsInit() {
 
 void UpdateButtons() {
     bool current_value[NUM_BUTTONS];
-    current_value[BTN_UP] = GPIOPinRead(BTN_UP_BASE, BTN_UP_PIN);
-    current_value[BTN_DOWN] = GPIOPinRead(BTN_DOWN_BASE, BTN_DOWN_PIN);
-    current_value[BTN_LEFT] = GPIOPinRead(BTN_LEFT_BASE, BTN_LEFT_PIN);
-    current_value[BTN_RIGHT] = GPIOPinRead(BTN_RIGHT_BASE, BTN_RIGHT_PIN);
+    /* Convert byte to bool */
+    current_value[BTN_UP] = !!GPIOPinRead(BTN_UP_BASE, BTN_UP_PIN);
+    current_value[BTN_DOWN] = !!GPIOPinRead(BTN_DOWN_BASE, BTN_DOWN_PIN);
+    current_value[BTN_LEFT] = !!GPIOPinRead(BTN_LEFT_BASE, BTN_LEFT_PIN);
+    current_value[BTN_RIGHT] = !!GPIOPinRead(BTN_RIGHT_BASE, BTN_RIGHT_PIN);
 
     for (uint8_t i = 0; i < NUM_BUTTONS; i++) {
         if (current_value[i] != current_state[i]) {
@@ -123,4 +118,17 @@ uint8_t NumPushes(uint8_t button_name) {
     if (!was_disabled)
         IntMasterEnable();
     return tmp_pushes;
+}
+
+void ResetPushes(void) {
+    bool was_disabled = IntMasterDisable();
+
+    for (uint8_t i = 0; i < NUM_BUTTONS; i++) {
+        current_state[i] = default_state[i];
+        count[i] = 0;
+        pushes[i] = 0;
+    }
+
+    if (!was_disabled)
+        IntMasterEnable();
 }

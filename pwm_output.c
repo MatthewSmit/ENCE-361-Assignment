@@ -5,10 +5,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "inc/hw_gpio.h"
 #include "inc/hw_memmap.h"
-#include "inc/hw_types.h"
-
 #include "driverlib/debug.h"
 #include "driverlib/gpio.h"
 #include "driverlib/pin_map.h"
@@ -42,7 +39,9 @@
 #define PWM_DIVIDER_CODE        SYSCTL_PWMDIV_16
 #define PWM_DIVIDER             16
 
-void SetPwmRange(uint32_t min, uint32_t max);
+static bool pwm_state[2];
+
+bool GetPwmState(uint8_t pwm_output);
 
 void PwmInit() {
     SysCtlPWMClockSet(PWM_DIVIDER_CODE);
@@ -62,6 +61,7 @@ void PwmInit() {
     PWMGenEnable(PWM_MAIN_BASE, PWM_MAIN_GEN);
 
     PWMGenPeriodSet(PWM_MAIN_BASE, PWM_MAIN_GEN, period);
+    SetPwmDutyCycle(MAIN_ROTOR, 2);
 
     /* Initialise Tail Rotor */
     SysCtlPeripheralEnable(PWM_TAIL_PERIPH_GPIO);
@@ -76,6 +76,7 @@ void PwmInit() {
     PWMGenEnable(PWM_TAIL_BASE, PWM_TAIL_GEN);
 
     PWMGenPeriodSet(PWM_TAIL_BASE, PWM_TAIL_GEN, period);
+    SetPwmDutyCycle(TAIL_ROTOR, 2);
 }
 
 void SetPwmDutyCycle(uint8_t pwm_output, uint32_t duty_cycle) {
@@ -93,15 +94,41 @@ void SetPwmDutyCycle(uint8_t pwm_output, uint32_t duty_cycle) {
 	}
 }
 
+uint32_t GetPwmDutyCycle(uint8_t pwm_output) {
+    uint32_t duty_cycle;
+    uint32_t period = SysCtlClockGet() / PWM_DIVIDER / PWM_FREQUENCY;
+    if (pwm_state[pwm_output]) {
+        switch (pwm_output) {
+        case MAIN_ROTOR:
+            duty_cycle = PWMPulseWidthGet(PWM_MAIN_BASE, PWM_MAIN_OUTNUM) * 100
+                    / period;
+            break;
+        case TAIL_ROTOR:
+            duty_cycle = PWMPulseWidthGet(PWM_TAIL_BASE, PWM_TAIL_OUTNUM) * 100
+                    / period;
+            break;
+        }
+    } else {
+        duty_cycle = 0;
+    }
+    return duty_cycle;
+}
+
 void SetPwmState(uint8_t pwm_output, bool state) {
 	switch (pwm_output) {
 	case MAIN_ROTOR:
 		PWMOutputState(PWM_MAIN_BASE, PWM_MAIN_OUTBIT, state);
+        pwm_state[MAIN_ROTOR] = state;
 		break;
 	case TAIL_ROTOR:
 		PWMOutputState(PWM_TAIL_BASE, PWM_TAIL_OUTBIT, state);
+        pwm_state[TAIL_ROTOR] = state;
 		break;
 	}
+}
+
+bool GetPwmState(uint8_t pwm_output) {
+    return pwm_state[pwm_output];
 }
 
 void PwmEnable(uint8_t pwm_output) {

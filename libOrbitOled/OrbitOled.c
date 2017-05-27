@@ -51,10 +51,10 @@ extern int ychOledMax;
 int xcoOledCur;
 int ycoOledCur;
 
-char * pbOledCur;			//address of byte corresponding to current location
-int bnOledCur;			//bit number of bit corresponding to current location
-char clrOledCur;			//drawing color to use
-char * pbOledPatCur;		//current fill pattern
+char * pbOledCur; //address of byte corresponding to current location
+int bnOledCur; //bit number of bit corresponding to current location
+char clrOledCur; //drawing color to use
+char * pbOledPatCur; //current fill pattern
 int fOledCharUpdate;
 
 int dxcoOledFontCur;
@@ -152,16 +152,15 @@ void OrbitOledHostInit() {
     GPIOPinConfigure(SDI_OLED);
     GPIOPinConfigure(SCK_OLED);
     SSIClockSourceSet(SSI3_BASE, SSI_CLOCK_SYSTEM);
-    SSIConfigSetExpClk(SSI3_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_0,
-            SSI_MODE_MASTER, 8000000, 8);
+    SSIConfigSetExpClk(SSI3_BASE, SysCtlClockGet(), SSI_FRF_MOTO_MODE_0, SSI_MODE_MASTER, 8000000, 8);
     SSIEnable(SSI3_BASE);
 
     /* Make power control pins be outputs with the supplies off
      */
     GPIOPinWrite(VBAT_OLEDPort, VBAT_OLED, VBAT_OLED);
     GPIOPinWrite(VDD_OLEDPort, VDD_OLED, VDD_OLED);
-    GPIOPinTypeGPIOOutput(VBAT_OLEDPort, VBAT_OLED);//VDD power control (1=off)
-    GPIOPinTypeGPIOOutput(VDD_OLEDPort, VDD_OLED);	//VBAT power control (1=off)
+    GPIOPinTypeGPIOOutput(VBAT_OLEDPort, VBAT_OLED); //VDD power control (1=off)
+    GPIOPinTypeGPIOOutput(VDD_OLEDPort, VDD_OLED); //VBAT power control (1=off)
 
     /* Make the Data/Command select, Reset, and SSI CS pins be outputs.
      * The nDC_OLED pin is PD7 an is a special GPIO (it is an NMI pin)
@@ -170,9 +169,9 @@ void OrbitOledHostInit() {
      * 2. Write to appropriate bit in the Commit Register (bit 7)
      * 3. Re-lock the GPIOLOCK register
      */
-    HWREG(GPIO_PORTD_BASE + GPIO_O_LOCK) = 0x4C4F434B;	// unlock
-    HWREG(GPIO_PORTD_BASE + GPIO_O_CR) |= 1 << 7; 		// allow writes
-    HWREG(GPIO_PORTD_BASE + GPIO_O_LOCK) = 0x0;			// re-lock
+    HWREG(GPIO_PORTD_BASE + GPIO_O_LOCK) = 0x4C4F434B; // unlock
+    HWREG(GPIO_PORTD_BASE + GPIO_O_CR) |= 1 << 7; // allow writes
+    HWREG(GPIO_PORTD_BASE + GPIO_O_LOCK) = 0x0; // re-lock
     GPIOPinWrite(nDC_OLEDPort, nDC_OLED, nDC_OLED);
     GPIOPinTypeGPIOOutput(nDC_OLEDPort, nDC_OLED);
     GPIOPinWrite(nDC_OLEDPort, nDC_OLED, nDC_OLED);
@@ -285,13 +284,13 @@ void OrbitOledDevInit() {
 
     /* Send the commands to invert the display.
      */
-    Ssi3PutByte(0xA1);			//remap columns
-    Ssi3PutByte(0xC8);			//remap the rows
+    Ssi3PutByte(0xA1); //remap columns
+    Ssi3PutByte(0xC8); //remap the rows
 
     /* Send the commands to select sequential COM configuration
      */
-    Ssi3PutByte(0xDA);			//set COM configuration command
-    Ssi3PutByte(0x20);			//sequential COM, left/right remap enabled
+    Ssi3PutByte(0xDA); //set COM configuration command
+    Ssi3PutByte(0x20); //sequential COM, left/right remap enabled
 
     /* Send Display On command
      */
@@ -382,13 +381,13 @@ void OrbitOledUpdate() {
 
         /* Set the page address
          */
-        Ssi3PutByte(0x22);		//Set page command
-        Ssi3PutByte(ipag);		//page number
+        Ssi3PutByte(0x22); //Set page command
+        Ssi3PutByte(ipag); //page number
 
         /* Start at the left column
          */
-        Ssi3PutByte(0x00);		//set low nibble of column
-        Ssi3PutByte(0x10);		//set high nibble of column
+        Ssi3PutByte(0x00); //set low nibble of column
+        Ssi3PutByte(0x10); //set high nibble of column
 
         GPIOPinWrite(nDC_OLEDPort, nDC_OLED, nDC_OLED);
 
@@ -415,7 +414,7 @@ void OrbitOledUpdate() {
  **		none
  **
  **	Description:
- **		Send the bytes specified in rgbTx to the slave 
+ **		Send the bytes specified in rgbTx to the slave
  */
 
 void OrbitOledPutBuffer(int cb, char * rgbTx) {

@@ -2,45 +2,28 @@
  * Main Program
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include "inc/hw_ints.h"
-#include "inc/hw_memmap.h"
-#include "inc/hw_types.h"
-#include "driverlib/adc.h"
-#include "driverlib/debug.h"
+
 #include "driverlib/fpu.h"
-#include "driverlib/gpio.h"
 #include "driverlib/interrupt.h"
 #include "driverlib/sysctl.h"
 #include "driverlib/systick.h"
-#include "driverlib/timer.h"
-#include "driverlib/uart.h"
+#include "utils/scheduler.h"
 #include "utils/uartstdio.h"
 #include "utils/ustdlib.h"
-#include "utils/scheduler.h"
 
 #include "buttons.h"
-#include "height_manager.h"
+#include "flight_controller.h"
+#include "height.h"
 #include "height_controller.h"
 #include "oled_interface.h"
 #include "pwm_output.h"
+#include "reset.h"
 #include "serial_interface.h"
+#include "switch.h"
+#include "yaw.h"
 #include "yaw_controller.h"
-#include "yaw_manager.h"
-
-#define SYSTICK_FREQUENCY   200
-
-tSchedulerTask g_psSchedulerTable[3];
-uint32_t g_ui32SchedulerNumTasks = 3;
-
-void Initialise();
-void Draw();
-void RegisterTasks();
-void UpdateSerial();
-void DemoButtons();
 
 #ifdef DEBUG
 void __error__(char *pcFilename, uint32_t ui32Line) {
@@ -49,139 +32,90 @@ void __error__(char *pcFilename, uint32_t ui32Line) {
 }
 #endif
 
-void Initialise() {
-    SysCtlClockSet(SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN| SYSCTL_XTAL_16MHZ);
+/*
+ * Register task function prototypes.
+ */
+void Draw();
+void UpdateSerial();
 
+/*
+ * Register function prototypes.
+ */
+void Initialise(void);
+
+tSchedulerTask g_psSchedulerTable[5] = {
+        [0] = { .bActive = true, .pfnFunction = UpdateButtons, .ui32FrequencyTicks = 2 },
+        [1] = { .bActive = true, .pfnFunction = UpdateSwitch, .ui32FrequencyTicks = 2 },
+        [2] = { .bActive = true, .pfnFunction = UpdateFlightMode, .ui32FrequencyTicks = 10 },
+        [3] = { .bActive = true, .pfnFunction = UpdateSerial, .ui32FrequencyTicks = 50 },
+        [4] = { .bActive = true, .pfnFunction = Draw, .ui32FrequencyTicks = 10 } };
+uint32_t g_ui32SchedulerNumTasks = 5;
+
+void Initialise(void) {
+    /*
+     * Set the clock to 80 MHz.
+     */
+    SysCtlClockSet(
+    SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
+
+    //
+    // Enable lazy stacking for interrupt handlers.  This allows floating-point
+    // instructions to be used within interrupt handlers, but at the expense of
+    // extra stack usage.
+    //
     FPULazyStackingEnable();
 
-    SchedulerInit(SYSTICK_FREQUENCY);
+    SchedulerInit(PWM_FREQUENCY);
     SysTickIntRegister(SchedulerSysTickIntHandler);
 
-    PwmInit();
+    ResetInit();
     ButtonsInit();
+    SwitchInit();
+
     YawManagerInit();
     HeightManagerInit();
+
+    FlightControllerInit();
 
     OledInit();
     SerialInit();
 }
 
-void RegisterTasks() {
-    tSchedulerTask *task_ptr = g_psSchedulerTable;
-    task_ptr->bActive = true;
-    task_ptr->pfnFunction = UpdateButtons;
-    task_ptr->ui32FrequencyTicks = 0;
-
-    task_ptr++;
-    task_ptr->bActive = true;
-    task_ptr->pfnFunction = DemoButtons;
-    task_ptr->ui32FrequencyTicks = 50;
-
-    task_ptr++;
-    task_ptr->bActive = true;
-    task_ptr->pfnFunction = Draw;
-    task_ptr->ui32FrequencyTicks = 10;
-
-//    task_ptr++;
-//    task_ptr->bActive = true;
-//    task_ptr->pfnFunction = UpdateSerial;
-//    task_ptr->ui32FrequencyTicks = 20;
-}
-
 void Draw() {
+    int32_t height = GetHeightPercentage();
+    uint32_t target_height = GetTargetHeight();
+    int32_t yaw = GetYawDegrees();
+    int32_t target_yaw = GetTargetYawDegrees();
     char text_buffer[17];
-    usnprintf(text_buffer, sizeof(text_buffer), "Ticks");
+    OledClearBuffer();
+    usnprintf(text_buffer, sizeof(text_buffer), "Alt: %d [%d]", height, target_height);
     OledStringDraw(text_buffer, 0, 0);
-    usnprintf(text_buffer, sizeof(text_buffer), "%d", SchedulerTickCountGet());
+    usnprintf(text_buffer, sizeof(text_buffer), "Yaw: %d [%d]", yaw, target_yaw);
     OledStringDraw(text_buffer, 0, 1);
 }
 
-void DemoButtons() {
-    static double gain = 100.0;
-    static double scale = 1.0;
-    static bool started = false;
-    uint8_t presses;
-    presses = NumPushes(BTN_UP);
-    gain += scale * presses;
-    presses = NumPushes(BTN_DOWN);
-    gain -= scale * presses;
-    presses = NumPushes(BTN_RIGHT);
-    if (presses > 0) {
-        TuneParamTailRotor(0.0, 0.0, 0.0);
-        SysCtlDelay(SysCtlClockGet() / 6);
-        YawControllerInit();
-        if (!started) {
-            started = true;
-            UARTprintf("start\n");
-            SchedulerTaskEnable(2, true);
-        }
-    }
-//        SchedulerTaskDisable(3);
-    presses = NumPushes(BTN_LEFT);
-    if (presses > 0) {
-        if (started) {
-            started = false;
-            UARTprintf("end [%d]\n", (uint32_t) (gain * 1000));
-            SchedulerTaskDisable(2);
-            }
-    }
-
-//    TuneParamMainRotor(gain, 0.0, 0.0);
-    TuneParamTailRotor(1.0, 0.0, gain / 1000.0);
-}
-
+/**
+ * Send heli info to UART.
+ */
 void UpdateSerial() {
-    UARTprintf("%d, %d\n", GetYaw(), SchedulerTickCountGet());
-//    UARTprintf("Height: %d [%d]\n", GetHeight(), GetHeightPercentage());
-//    UARTprintf("----------\n\n");
-//	UARTprintf("k_p %d", (int) (k_p * 100));
-#ifdef DEBUG
+    int32_t height = GetHeightPercentage();
+    uint32_t target_height = GetTargetHeight();
+    int32_t yaw = GetYawDegrees();
+    int32_t target_yaw = GetTargetYawDegrees();
+    uint32_t duty_cycle_main = GetPwmDutyCycle(MAIN_ROTOR);
+    uint32_t duty_cycle_tail = GetPwmDutyCycle(TAIL_ROTOR);
+    const char *flight_mode = GetFlightMode();
 
-#endif
+    UARTprintf("Alt: %d [%d]\n"
+            "Yaw: %d [%d]\n"
+            "Main: [%d] Tail: [%d]\n"
+            "Mode: %s\n"
+            "\n", height, target_height, yaw, target_yaw, duty_cycle_main, duty_cycle_tail,
+            flight_mode);
 }
 
-#ifdef DEBUG
-void TimerHandler(void) {
-    TimerIntClear(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
-    UpdateHeight();
-    UpdateYawController(1000 / PWM_FREQUENCY);
-    SetPwmDutyCycle(MAIN_ROTOR, 30);
-//    UpdateHeightController(1000 / PWM_FRE);
-}
-
-void TimerInit(void) {
-    SysCtlPeripheralEnable(SYSCTL_PERIPH_TIMER0);
-    TimerConfigure(TIMER0_BASE, TIMER_CFG_PERIODIC);
-    TimerLoadSet(TIMER0_BASE, TIMER_A, SysCtlClockGet() / PWM_FREQUENCY);
-
-    TimerIntRegister(TIMER0_BASE, TIMER_A, TimerHandler);
-    //
-    // Setup the interrupts for the timer timeouts.
-    //
-    IntEnable(INT_TIMER0A);
-    TimerIntEnable(TIMER0_BASE, TIMER_TIMA_TIMEOUT);
-
-    //
-    // Enable the timers.
-    //
-    TimerEnable(TIMER0_BASE, TIMER_A);
-
-}
-#endif
-
-int main() {
+int main(void) {
     Initialise();
-    RegisterTasks();
-
-#ifdef DEBUG
-//    SysCtlDelay(SysCtlClockGet());
-
-    SetTargetHeight(20);
-    TimerInit();
-    PwmEnable(TAIL_ROTOR);
-    PwmEnable(MAIN_ROTOR);
-#endif
-
     IntMasterEnable();
 
     while (1) {

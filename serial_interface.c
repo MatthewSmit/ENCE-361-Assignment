@@ -5,11 +5,9 @@
  *      Author: daniel
  */
 
-#include "serial_interface.h"
-
 #include <stdbool.h>
 #include <stdint.h>
-#include "inc/hw_types.h"
+
 #include "inc/hw_memmap.h"
 #include "driverlib/gpio.h"
 #include "driverlib/pin_map.h"
@@ -17,6 +15,7 @@
 #include "driverlib/uart.h"
 #include "utils/uartstdio.h"
 
+#include "serial_interface.h"
 
 #define UART_BASE               UART0_BASE
 #define UART_PORT               0
