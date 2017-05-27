@@ -87,7 +87,7 @@ void TimerHandler(void) {
 
 void TimerInit(void) {
     SysCtlPeripheralEnable(TIMER_PERIPH);
-    TimerConfigure(TIMER_BASE, TIMER_CFG_PERIODIC);
+    TimerConfigure(TIMER_BASE, TIMER_CONFIG);
     TimerLoadSet(TIMER_BASE, TIMER_TIMER, SysCtlClockGet() / PWM_FREQUENCY);
 
     TimerIntRegister(TIMER_BASE, TIMER_TIMER, TimerHandler);
