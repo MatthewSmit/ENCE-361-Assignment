@@ -2,14 +2,14 @@
  * @file orbitOledInterface.c
  */
 
-#include "libOrbitOled/OrbitOled.h"
-#include "libOrbitOled/delay.h"
-#include "libOrbitOled/FillPat.h"
-#include "libOrbitOled/LaunchPad.h"
-#include "libOrbitOled/OrbitBoosterPackDefs.h"
-#include "libOrbitOled/OrbitOled.h"
-#include "libOrbitOled/OrbitOledChar.h"
-#include "libOrbitOled/OrbitOledGrph.h"
+#include "../lib/libOrbitOled/OrbitOled.h"
+#include "../lib/libOrbitOled/delay.h"
+#include "../lib/libOrbitOled/FillPat.h"
+#include "../lib/libOrbitOled/LaunchPad.h"
+#include "../lib/libOrbitOled/OrbitBoosterPackDefs.h"
+#include "../lib/libOrbitOled/OrbitOled.h"
+#include "../lib/libOrbitOled/OrbitOledChar.h"
+#include "../lib/libOrbitOled/OrbitOledGrph.h"
 
 #include "oled_interface.h"
 

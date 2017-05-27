@@ -26,22 +26,17 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>ringbuf.c</name>
-			<type>1</type>
-			<locationURI>TIVAWARE_DIR/utils/ringbuf.c</locationURI>
-		</link>
-		<link>
-			<name>scheduler.c</name>
+			<name>utils/scheduler.c</name>
 			<type>1</type>
 			<locationURI>TIVAWARE_DIR/utils/scheduler.c</locationURI>
 		</link>
 		<link>
-			<name>uartstdio.c</name>
+			<name>utils/uartstdio.c</name>
 			<type>1</type>
 			<locationURI>TIVAWARE_DIR/utils/uartstdio.c</locationURI>
 		</link>
 		<link>
-			<name>ustdlib.c</name>
+			<name>utils/ustdlib.c</name>
 			<type>1</type>
 			<locationURI>TIVAWARE_DIR/utils/ustdlib.c</locationURI>
 		</link>
