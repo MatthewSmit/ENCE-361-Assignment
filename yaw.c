@@ -73,6 +73,7 @@ void YawManagerInit(void) {
 }
 
 void YawRefTrigger(void) {
+    ref_found = false;
     GPIOIntEnable(YAW_REF_BASE, YAW_REF_PIN);
 }
 

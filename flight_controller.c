@@ -291,43 +291,35 @@ void UpdateFlightMode() {
             ResetError();
             elapsed_ticks = SchedulerTickCountGet();
         } else if (!wait_2 && is_target_yaw_reached) {
-            /*
-             * Wait until all landing criteria are met.
-             */
             wait_2 = true;
-        } else if (wait_2) {
-            if (is_target_yaw_reached && is_target_height_reached) {
-                wait = false;
-                wait_2 = false;
-                PwmDisable(MAIN_ROTOR);
-                PwmDisable(TAIL_ROTOR);
+        } else {
+            if (GetTargetHeight() == 0) {
                 /*
-                 * Go to the LANDED state after disabling PWM
+                 * If 10 seconds has elapsed since it reached target height go to LANDED state
+                 * regardless of yaw.
                  */
-                flight_state = LANDED;
+                if (is_target_height_reached
+                        && (is_target_yaw_reached
+                                || (SchedulerElapsedTicksGet(elapsed_ticks) * (1000 / PWM_FREQUENCY)
+                                        > 10000))) {
+                    wait = false;
+                    wait_2 = false;
+                    PwmDisable(MAIN_ROTOR);
+                    PwmDisable(TAIL_ROTOR);
+                    /*
+                     * Go to the LANDED state after disabling PWM
+                     */
+                    flight_state = LANDED;
+                }
+
             } else {
-                if (GetTargetHeight() > 0) {
-                    if ((SchedulerElapsedTicksGet(elapsed_ticks) * (1000 / PWM_FREQUENCY))
-                            >= RATE_OF_DESCENT) {
-                        elapsed_ticks = SchedulerTickCountGet();
-                        SetTargetHeight(GetTargetHeight() - 1);
-                    }
+                if (wait_2
+                        && ((SchedulerElapsedTicksGet(elapsed_ticks) * (1000 / PWM_FREQUENCY))
+                                >= RATE_OF_DESCENT)) {
+                    elapsed_ticks = SchedulerTickCountGet();
+                    SetTargetHeight(GetTargetHeight() - 1);
                 }
             }
-        } else if (is_target_height_reached
-                && ((SchedulerElapsedTicksGet(elapsed_ticks) * (1000 / PWM_FREQUENCY)) > 10000)) {
-            /*
-             * If 10 seconds has elapsed since it reached target height go to LANDED state
-             * regardless of yaw.
-             */
-            wait = false;
-            wait_2 = false;
-            PwmDisable(MAIN_ROTOR);
-            PwmDisable(TAIL_ROTOR);
-            /*
-             * Go to the LANDED state after disabling PWM
-             */
-            flight_state = LANDED;
         }
         break;
     }

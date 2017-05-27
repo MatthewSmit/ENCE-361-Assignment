@@ -87,7 +87,7 @@ int32_t GetHeight() {
 }
 
 int32_t GetHeightPercentage() {
-    return (GetHeight() * 100 + FULL_SCALE_RANGE / 2) / (FULL_SCALE_RANGE);
+    return GetHeight() * 100 / FULL_SCALE_RANGE;
 }
 
 void UpdateHeight(void) {
