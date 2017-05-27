@@ -31,6 +31,7 @@ void TimerInit(void);
 void TimerHandler(void);
 void PriorityTaskDisable(void);
 void PriorityTaskEnable(void);
+void PriorityTaskInit(void);
 void UpdateError(void);
 void ResetError(void);
 bool HasReachedTargetYaw(void);
