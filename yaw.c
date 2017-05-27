@@ -26,13 +26,6 @@ static bool ref_found = false;
 
 static const int8_t lookup_table[] = {0, -1, 1, 0, 1, 0, 0, -1, -1, 0, 0, 1, 0, 1, -1, 0};
 
-const char* const flight_mode_string[4] = {
-    "Landed",
-    "Init",
-    "Flying",
-    "Landing"
-};
-
 static void YawHandler(void) {
     static uint8_t state = 0;
     uint8_t previous_state = state;

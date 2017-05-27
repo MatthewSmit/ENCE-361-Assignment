@@ -50,11 +50,11 @@ bool HasReachedTargetHeight(void);
 /*
  * Acceptable tolerance for yaw error (rotation unit defined in YAW_FULL_ROTATION)
  */
-#define YAW_SAMPLE_TOLERANCE        3
+#define YAW_SAMPLE_TOLERANCE        2
 /*
  * Acceptable tolerance for height error (%)
  */
-#define HEIGHT_SAMPLE_TOLERANCE     2
+#define HEIGHT_SAMPLE_TOLERANCE     1
 /*
  * Number of samples to summate error over
  */
@@ -77,6 +77,7 @@ static uint16_t yaw_error_buf[NUM_ERROR_SAMPLES];
 static const uint16_t height_tolerance = HEIGHT_SAMPLE_TOLERANCE * NUM_ERROR_SAMPLES;
 static uint16_t height_error_buf[NUM_ERROR_SAMPLES];
 
+static const char* flight_mode[] = { "Landed", "Init", "Flying", "Landing" };
 static uint8_t flight_state;
 static int32_t target_yaw;
 static int32_t target_height;
@@ -138,7 +139,7 @@ void FlightControllerInit(void) {
 void UpdateError(void) {
     static uint32_t idx = 0;
     uint16_t yaw_sample_err = abs(GetYaw() - GetTargetYaw());
-    uint16_t height_sample_err = abs(GetHeight() - GetTargetHeight());
+    uint16_t height_sample_err = abs(GetHeightPercentage() - (int32_t) GetTargetHeight());
     yaw_error_buf[idx] = yaw_sample_err;
     height_error_buf[idx] = height_sample_err;
     idx = (idx + 1) % NUM_ERROR_SAMPLES;
@@ -271,8 +272,10 @@ void UpdateFlightMode() {
 
     case LANDING: {
         UpdateError();
-        bool is_target_yaw_reached = HasReachedTargetYaw();
         bool is_target_height_reached = HasReachedTargetHeight();
+        bool is_target_yaw_reached = HasReachedTargetYaw();
+
+        UARTprintf("TH: %d TY: %d\n", is_target_height_reached, is_target_yaw_reached);
 
         if (!wait) {
             /*
@@ -332,6 +335,7 @@ void UpdateFlightMode() {
     }
 }
 
-uint8_t GetFlightMode(void) {
-    return flight_state;
+const char* GetFlightMode(void) {
+    return flight_mode[flight_state];
 }
+

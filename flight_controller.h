@@ -12,11 +12,8 @@ enum {
     LANDED, INIT, FLYING, LANDING
 };
 
-extern const char* const flight_mode_string[4];
-
-//void PriorityTaskInit(void);
 void FlightControllerInit(void);
 void UpdateFlightMode();
-uint8_t GetFlightMode(void);
+const char* GetFlightMode(void);
 
 #endif /* FLIGHT_CONTROLLER_H_ */
