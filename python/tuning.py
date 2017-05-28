@@ -11,7 +11,7 @@ from scipy import signal
 import os
 import re
 
-
+# Path location of the data files
 DATA_PATH = 'data'
 
 # Rate in Hz of the serial output
@@ -21,8 +21,8 @@ SAMPLING_RATE = 10
 def get_files(path):
     """
 
-    :param path:
-    :return:
+    :param path: the directory containing the data files
+    :return: all of the txt files within the data directory
     """
     with os.scandir(path) as it:
         return [entry.path for entry in it if entry.name.endswith('.txt') and entry.is_file()]
@@ -31,8 +31,8 @@ def get_files(path):
 def get_heli(filename):
     """
 
-    :param filename:
-    :return:
+    :param filename: the file to process
+    :return: the heli number info string
     """
     with open(filename) as infile:
         lines = infile.readlines()
@@ -83,9 +83,9 @@ def process_sessions(filename, n_last):
 def find_osc_period(data, sampling_rate):
     """
 
-    :param data:
-    :param sampling_rate:
-    :return:
+    :param data: the data (either height or yaw readings) that has been output to serial
+    :param sampling_rate: rate of serial output
+    :return: the period (s) of induced oscillation
     """
     data = signal.detrend(data, type='constant')
     sampling_period = 1 / sampling_rate
