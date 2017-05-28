@@ -12,6 +12,12 @@ import os
 import re
 
 
+DATA_PATH = 'data'
+
+# Rate in Hz of the serial output
+SAMPLING_RATE = 10
+
+
 def get_files(path):
     """
 
@@ -35,66 +41,75 @@ def get_heli(filename):
                 return line.strip()
 
 
-def process_sessions(filename, nlast):
+def process_sessions(filename, n_last):
     """
+    File has the following format.
 
-    :param filename:
-    :param nlast
-    :return:
+    start
+    data_1, time_1
+    data_1, time_1
+    ...
+    data_1, time_1
+    end [gain]
+
+    :param filename: the file to process
+    :param n_last: only process n_last sessions from this file
+    :return: a dictionary mapping session id to a tuple of the form (gain, period)
     """
     with open(filename) as infile:
-        match_exp = re.compile('^start(.+?)end.+?\[(.+?)\]$', re.MULTILINE | re.DOTALL)
-        sessions = re.findall(match_exp, infile.read())
-        assert len(sessions) >= nlast
-        sid_dict = {}
-        for sid in range(1, nlast+1):
-            (session, gain) = sessions[-sid]
-            gain = float(gain) / 1000.0
-            data = filter(None, map(str.strip, session.split('\n')))
-            frequency_data = []
-            times = []
-            for entry in data:
-                e = entry.split(',')
-                frequency_data.append(int(e[0]))
-                times.append(int(e[1]))
+        text = infile.read()
 
-            peak = find_osc_period(numpy.array(frequency_data), 10)
-            sid_dict[sid] = (gain, peak)
-        return len(sessions), sid_dict
+    # Extract the session data from a block of text.
+    match_exp = re.compile('^start(.+?)end.+?\[(.+?)\]$', re.MULTILINE | re.DOTALL)
+    sessions = re.findall(match_exp, text)
+
+    assert len(sessions) >= n_last
+
+    sid_dict = {}
+    for sid in reversed(range(len(sessions) - n_last, len(sessions))):
+        (session, gain) = sessions[sid]
+        gain = float(gain) / 1000.0
+        session_data = filter(None, map(str.strip, session.split('\n')))
+        data = []
+        for entry in session_data:
+            dp = int(entry.split(',')[0])
+            data.append(dp)
+
+        period = find_osc_period(numpy.array(data), SAMPLING_RATE)
+        sid_dict[sid + 1] = (gain, period)
+    return sid_dict
 
 
-def find_osc_period(frequency_data, sampling_rate):
+def find_osc_period(data, sampling_rate):
     """
 
-    :param frequency_data:
+    :param data:
     :param sampling_rate:
     :return:
     """
-    frequency_data = signal.detrend(frequency_data, type='constant')
-    num_samples = frequency_data.size
+    data = signal.detrend(data, type='constant')
     sampling_period = 1 / sampling_rate
 
-    yf = rfft(frequency_data, n=frequency_data.size)
-    xf = rfftfreq(frequency_data.size, sampling_period)[:num_samples]
+    yf = rfft(data)
+    xf = rfftfreq(data.size, sampling_period)
 
-    (idx, _) = max(enumerate(abs(yf)), key=lambda x: x[1])
+    idx = numpy.argmax(abs(yf))
 
     return xf[idx]
 
 
 def main():
-    for infile in get_files('data'):
-        print('-' * 20)
+    for infile in get_files(DATA_PATH):
+        print('-' * 30)
         print('{} - {}'.format(get_heli(infile), infile))
 
-        (n, sessions) = process_sessions(infile, 1)
-        print('{} sessions in total\n'.format(n))
-        for sid in sorted(sessions):
+        sessions = process_sessions(infile, 1)
+        print('{} sessions in total\n'.format(max(sessions)))
+        for sid in reversed(sorted(sessions)):
             (gain, period) = sessions[sid]
-            print('Session {}:'.format(n - sid + 1))
-            print("Ultimate gain: {}".format(gain))
-            print('Oscillation period (s): {:.3f}'.format(period))
-            print()
+            print('Session {}:'.format(sid))
+            print('Ultimate gain: {}'.format(gain))
+            print('Oscillation period (s): {:.3f}\n'.format(period))
         print()
 
 if __name__ == '__main__':
