@@ -16,4 +16,6 @@ void FlightControllerInit(void);
 void UpdateFlightMode();
 const char* GetFlightMode(void);
 
+void PriorityTaskInit(void);
+
 #endif /* FLIGHT_CONTROLLER_H_ */

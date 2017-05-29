@@ -168,7 +168,7 @@ void UpdateFlightMode() {
     static bool wait_2 = false;
     static uint32_t elapsed_ticks = 0;
     bool event = GetSwitchEvent();
-    uint8_t presses[4];
+    uint8_t presses[NUM_BUTTONS];
     int32_t target_yaw;
     int32_t target_height;
 

@@ -13,7 +13,7 @@
 #include "pid.h"
 #include "pwm.h"
 
-static const double ultimate_gain = 1.0;
+static const double ultimate_gain = 1.0 / 10.0;
 static const double period = 700.0;
 
 static double integral_time;
@@ -24,6 +24,7 @@ static double derivative_gain;
 
 static PidState height_state;
 static uint32_t target_height;
+static uint32_t target_height_degrees;
 
 void HeightControllerInit(void) {
     integral_time = period * 2.2;
@@ -39,15 +40,16 @@ void HeightControllerInit(void) {
 void SetTargetHeight(uint32_t height) {
     ASSERT(height <= 100);
 
-	target_height = height;
+	target_height_degrees = height;
+	target_height = height * FULL_SCALE_RANGE / 100;
 }
 
 uint32_t GetTargetHeight(void) {
-    return target_height;
+    return target_height_degrees;
 }
 
 void UpdateHeightController(uint32_t delta_t) {
-	int32_t height = GetHeightPercentage();
+	int32_t height = GetHeight();
     int32_t error = (int32_t) target_height - height;
     int32_t control = UpdatePid(&height_state, error, delta_t,
             proportional_gain, integral_gain, derivative_gain);
@@ -58,7 +60,8 @@ void UpdateHeightController(uint32_t delta_t) {
 }
 
 void PreloadHeightController(int32_t control, int32_t error) {
-    double proportional_control = error * proportional_gain;
+	int32_t full_scale_error = error * FULL_SCALE_RANGE / 100.0;
+    double proportional_control = full_scale_error * proportional_gain;
     int32_t integral_preload = (control - proportional_control) / integral_gain;
     PreloadPid(&height_state, integral_preload);
 }

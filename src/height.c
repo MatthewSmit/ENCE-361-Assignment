@@ -11,8 +11,7 @@
 #include "driverlib/gpio.h"
 #include "driverlib/sysctl.h"
 
-#define FULL_SCALE_RANGE 993 // 0.8 V sensor range
-//#define FULL_SCALE_RANGE 1241 // 1.0 V sensor range
+#include "height.h"
 
 #define ADC_GPIO_BASE       GPIO_PORTE_BASE
 #define ADC_GPIO_PIN        GPIO_PIN_4
