@@ -205,7 +205,7 @@ void UpdateFlightMode() {
             YawRefTrigger();
             ZeroHeightTrigger();
             PriorityTaskDisable();
-            SetPwmDutyCycle(MAIN_ROTOR, 30);
+            SetPwmDutyCycle(MAIN_ROTOR, 25);
             PwmEnable(MAIN_ROTOR);
         }
         break;

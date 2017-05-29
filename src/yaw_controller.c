@@ -71,5 +71,6 @@ void TuneProportionalTailRotor(double gain) {
     proportional_gain = gain;
     integral_gain = 0.0;
     derivative_gain = 0.0;
+    PidInit(&yaw_state);
 }
 

@@ -13,7 +13,7 @@
 #include "pid.h"
 #include "pwm.h"
 
-static const double ultimate_gain = 1.0 / 10.0;
+static const double ultimate_gain = 0.1;
 static const double period = 700.0;
 
 static double integral_time;
@@ -67,7 +67,8 @@ void PreloadHeightController(int32_t control, int32_t error) {
 }
 
 void TuneProportionalMainRotor(double gain) {
-    proportional_gain = proportional_gain;
+    proportional_gain = gain;
     integral_gain = 0.0;
     derivative_gain = 0.0;
+    PidInit(&height_state);
 }
