@@ -4,6 +4,7 @@ Python module to find optimal parameters for helicopter rig.
 Author: Daniel van Wichen
 Date: 2017-05-27
 """
+from builtins import len
 
 import numpy
 from numpy.fft import rfft, rfftfreq
@@ -15,7 +16,7 @@ import re
 DATA_PATH = 'data'
 
 # Rate in Hz of the serial output
-SAMPLING_RATE = 10
+SAMPLING_RATE = 20
 
 
 def get_files(path):
@@ -60,10 +61,11 @@ def process_sessions(filename, n_last):
         text = infile.read()
 
     # Extract the session data from a block of text.
-    pattern = re.compile('^start(.+?)^end(?: )+\[([0-9]+)\]$', re.MULTILINE | re.DOTALL)
+    pattern = re.compile('^start(.+?)^end(?: )+\[([0-9 ]+)\]$', re.MULTILINE | re.DOTALL)
     sessions = pattern.findall(text)
 
-    assert len(sessions) >= n_last
+    if len(sessions) < n_last:
+        n_last = len(sessions)
 
     sid_dict = {}
     for sid in reversed(range(len(sessions) - n_last, len(sessions))):
@@ -107,8 +109,8 @@ def main():
         print('-' * 30)
         print('{} - {}'.format(get_heli(infile), infile))
 
-        sessions = process_sessions(infile, 1)
-        print('{} sessions in total\n'.format(max(sessions)))
+        sessions = process_sessions(infile, 2)
+        print('{} sessions in total\n'.format(max(sessions) if sessions else 0))
         for sid in reversed(sorted(sessions)):
             (gain, period) = sessions[sid]
             print('Session {}:'.format(sid))

@@ -25,6 +25,12 @@
 #include "yaw.h"
 #include "yaw_controller.h"
 
+/*
+ * Tuning mode
+ */
+static uint8_t mode = TAIL_ROTOR;
+static bool target_reached = false;
+
 #ifdef DEBUG
 void __error__(char *pcFilename, uint32_t ui32Line) {
     while (1) {
@@ -48,7 +54,7 @@ tSchedulerTask g_psSchedulerTable[] = {
         [1] = { .bActive = true, .pfnFunction = UpdateSwitch, .ui32FrequencyTicks = 2 },
         [2] = { .bActive = true, .pfnFunction = UpdateSerial, .ui32FrequencyTicks = 10 },
         [3] = { .bActive = true, .pfnFunction = Tuning, .ui32FrequencyTicks = 10 } };
-uint32_t g_ui32SchedulerNumTasks = 5;
+uint32_t g_ui32SchedulerNumTasks = 4;
 
 void Initialise(void) {
     /*
@@ -78,16 +84,19 @@ void Initialise(void) {
     HeightControllerInit();
     YawControllerInit();
 
-    TuneProportionalMainRotor(0.0);
-
     PriorityTaskInit();
     PriorityTaskEnable();
 
     SerialInit();
     SchedulerTaskDisable(2);
 
+    if (mode == MAIN_ROTOR) {
+        TuneProportionalMainRotor(0.0);
+    } else {
+        TuneProportionalTailRotor(2.4);
+    }
     SetTargetYawDegrees(0);
-    SetTargetHeight(30);
+    SetTargetHeight(50);
     ZeroHeightTrigger();
 
     PwmEnable(MAIN_ROTOR);
@@ -95,23 +104,24 @@ void Initialise(void) {
 }
 
 void Tuning() {
-	static double inc = 1.0;
-	static double gain = 0.0;
+    static double inc = 0.1;
+    static double gain = 2.4;
 	uint8_t presses[NUM_BUTTONS];
 	static bool started = false;
 
+
+    for (uint8_t i = 0; i < NUM_BUTTONS; i++) {
+        presses[i] = NumPushes(i);
+    }
 	if (!started) {
-		for (uint8_t i = 0; i < NUM_BUTTONS; i++) {
-			presses[i] = NumPushes(i);
-		}
 
 		if (presses[BTN_UP] > 0) {
 			gain += inc * presses[BTN_UP];
-			UARTprintf("gain [%4d]\n", (uint32_t) (gain * 1000));
+            UARTprintf("gain [%d]\n", (uint32_t) (gain * 1000));
 		}
 		if (presses[BTN_DOWN] > 0) {
 			gain -= inc * presses[BTN_DOWN];
-			UARTprintf("gain [%4d]\n", (uint32_t) (gain * 1000));
+            UARTprintf("gain [%d]\n", (uint32_t) (gain * 1000));
 		}
 
 		if (presses[BTN_LEFT] > 0) {
@@ -131,15 +141,24 @@ void Tuning() {
     if (GetSwitchEvent() == SWITCH_UP) {
     	if (!started) {
     		started = true;
-            TuneProportionalMainRotor(gain);
-            SysCtlDelay(SysCtlClockGet() / 6);
+            if (mode == MAIN_ROTOR) {
+                target_reached = false;
+                TuneProportionalMainRotor(0.0);
+                SysCtlDelay(SysCtlClockGet() / 6);
+                TuneProportionalMainRotor(gain);
+            } else {
+                TuneProportionalTailRotor(0.0);
+                SysCtlDelay(SysCtlClockGet() / 9);
+                TuneProportionalTailRotor(gain);
+            }
     		UARTprintf("start\n");
     		SchedulerTaskEnable(2, true);
     	}
+        TuneProportionalTailRotor(gain);
     } else {
     	if (started) {
     		started = false;
-            UARTprintf("end [%4d]\n", (uint32_t) (gain * 1000));
+            UARTprintf("end [%d]\n", (uint32_t) (gain * 1000));
             SchedulerTaskDisable(2);
     	}
     }
@@ -149,9 +168,19 @@ void Tuning() {
  * Send heli info to UART.
  */
 void UpdateSerial() {
-    int32_t height = GetHeightPercentage();
+    int32_t data;
+
+    if (mode == MAIN_ROTOR) {
+        data = GetHeightPercentage();
+        if (data >= GetTargetHeight()) {
+            target_reached = true;
+        }
+    } else {
+        data = GetYaw();
+    }
+
     int32_t time = SchedulerTickCountGet() * 1000 / PWM_FREQUENCY;
-    UARTprintf("%d, %d\n", height, GetPwmDutyCycle(MAIN_ROTOR));
+    UARTprintf("%d, %d %d\n", data, GetPwmDutyCycle(MAIN_ROTOR), target_reached);
 }
 
 int main(void) {

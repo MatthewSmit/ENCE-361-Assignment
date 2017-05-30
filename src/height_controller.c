@@ -13,8 +13,10 @@
 #include "pid.h"
 #include "pwm.h"
 
-static const double ultimate_gain = 0.1;
-static const double period = 700.0;
+//static const double ultimate_gain = 0.195;
+static const double ultimate_gain = 0.110;
+//static const double period = 700.0;
+static const double period = 850.0;
 
 static double integral_time;
 static double derivative_time;
@@ -55,7 +57,7 @@ void UpdateHeightController(uint32_t delta_t) {
             proportional_gain, integral_gain, derivative_gain);
 
     /* Clamp control inside valid range */
-    control = (control < 15) ? 15 : (control > 95) ? 95 : control;
+    control = (control < 5) ? 5 : (control > 95) ? 95 : control;
     SetPwmDutyCycle(MAIN_ROTOR, control);
 }
 
