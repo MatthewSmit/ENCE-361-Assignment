@@ -70,8 +70,7 @@ def process_sessions(filename, n_last):
         (session, gain) = sessions[sid]
 
         # If session was started after a hard reset only look at the data after the last start
-        if 'start' in session:
-            (_, _, session) = session.rpartition('start')
+        (_, _, session) = session.rpartition('start')
 
         gain = float(gain) / 1000.0
         session_data = filter(None, map(str.strip, session.split('\n')))
