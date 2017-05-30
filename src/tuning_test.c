@@ -43,7 +43,7 @@ void Tuning();
  */
 void Initialise(void);
 
-tSchedulerTask g_psSchedulerTable[5] = {
+tSchedulerTask g_psSchedulerTable[] = {
         [0] = { .bActive = true, .pfnFunction = UpdateButtons, .ui32FrequencyTicks = 2 },
         [1] = { .bActive = true, .pfnFunction = UpdateSwitch, .ui32FrequencyTicks = 2 },
         [2] = { .bActive = true, .pfnFunction = UpdateSerial, .ui32FrequencyTicks = 10 },
