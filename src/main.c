@@ -72,7 +72,7 @@ void Initialise(void) {
     ButtonsInit();
     SwitchInit();
 
-    YawManagerInit();
+    YawDetectionInit();
     HeightManagerInit();
 
     FlightControllerInit();
