@@ -60,14 +60,19 @@ def process_sessions(filename, n_last):
         text = infile.read()
 
     # Extract the session data from a block of text.
-    match_exp = re.compile('^start(.+?)end.+?\[(.+?)\]$', re.MULTILINE | re.DOTALL)
-    sessions = re.findall(match_exp, text)
+    pattern = re.compile('^start(.+?)^end(?: )+\[([0-9]+)\]$', re.MULTILINE | re.DOTALL)
+    sessions = pattern.findall(text)
 
     assert len(sessions) >= n_last
 
     sid_dict = {}
     for sid in reversed(range(len(sessions) - n_last, len(sessions))):
         (session, gain) = sessions[sid]
+
+        # If session was started after a hard reset only look at the data after the last start
+        if 'start' in session:
+            (_, _, session) = session.rpartition('start')
+
         gain = float(gain) / 1000.0
         session_data = filter(None, map(str.strip, session.split('\n')))
         data = []
