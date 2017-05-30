@@ -27,19 +27,13 @@
 #define YAW_REF_PIN             GPIO_PIN_4
 #define YAW_REF_INT             INT_GPIOC
 
-/**
- * The current yaw in notches.
- */
 static volatile int32_t yaw = 0;
-/**
- * If the reference yaw has been found.
- */
 static volatile bool ref_found = false;
 
 static const int8_t lookup_table[] = { 0, -1, 1, 0, 1, 0, 0, -1, -1, 0, 0, 1, 0, 1, -1, 0 };
 
 /**
- * Handler for yaw interrupt.
+ * Yaw interrupt handler.
  */
 static void YawHandler(void) {
     static uint8_t state = 0;
@@ -55,6 +49,9 @@ static void YawHandler(void) {
     yaw += lookup_table[state | (previous_state << 2)];
 }
 
+/**
+ * Yaw reference interrupt handler.
+ */
 static void YawRefHandler(void) {
     /*
      * If the interrupt was caused by the reference signal.
@@ -68,16 +65,16 @@ static void YawRefHandler(void) {
 }
 
 void YawDetectionInit(void) {
-    /**
-     * Initialises the yaw GPIO pins.
+    /*
+     * Initialise the yaw GPIO pins.
      */
     SysCtlPeripheralEnable(YAW_PERIPH);
     GPIOPinTypeGPIOInput(YAW_BASE, YAW_GPIO_PINS);
     GPIOPadConfigSet(YAW_BASE, YAW_GPIO_PINS, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPD);
     GPIODirModeSet(YAW_BASE, YAW_GPIO_PINS, GPIO_DIR_MODE_IN);
 
-    /**
-     * Initialises the yaw interrupts.
+    /*
+     * Initialise the yaw interrupts.
      */
     GPIOIntTypeSet(YAW_BASE, YAW_GPIO_PINS, GPIO_BOTH_EDGES);
     GPIOIntRegister(YAW_BASE, YawHandler);
@@ -85,17 +82,16 @@ void YawDetectionInit(void) {
     GPIOIntEnable(YAW_BASE, YAW_GPIO_PINS);
     IntEnable(YAW_INT);
 
-    /**
-     * Initialises the reference yaw GPIO pins.
+    /*
+     * Initialise the reference yaw GPIO pins.
      */
     SysCtlPeripheralEnable(YAW_REF_PERIPH);
     GPIOPinTypeGPIOInput(YAW_REF_BASE, YAW_REF_PIN);
     GPIOPadConfigSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
     GPIODirModeSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_DIR_MODE_IN);
 
-    /**
-     * Initialises the reference yaw interrupt.
-     * Starts off disabled.
+    /*
+     * Initialise the reference yaw interrupt and disables it.
      */
     GPIOIntTypeSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_RISING_EDGE);
     GPIOIntRegister(YAW_REF_BASE, YawRefHandler);
@@ -117,15 +113,15 @@ int32_t GetYaw(void) {
     return yaw;
 }
 
-int32_t GetClosestYawRef(int32_t yaw) {
-    /**
+int32_t GetClosestYawRef(int32_t current_yaw) {
+    /*
      * Gets the yaw remainder, in the range [0, YAW_FULL_ROTATION).
      */
-    int32_t remainder = (yaw % YAW_FULL_ROTATION + YAW_FULL_ROTATION) % YAW_FULL_ROTATION;
+    int32_t remainder = (current_yaw % YAW_FULL_ROTATION + YAW_FULL_ROTATION) % YAW_FULL_ROTATION;
     if (remainder >= YAW_FULL_ROTATION / 2)
-        return yaw + YAW_FULL_ROTATION - remainder;
+        return current_yaw + YAW_FULL_ROTATION - remainder;
     else
-        return yaw - remainder;
+        return current_yaw - remainder;
 }
 
 int32_t GetYawDegrees(void) {

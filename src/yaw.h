@@ -1,17 +1,18 @@
 /**
  * @file yaw.h
  *
- * Handles the low level yaw detection.
+ * Handles the all of the yaw and yaw reference detection.
  */
 
 #ifndef YAW_H_
 #define YAW_H_
 
-/**
+/*
  * The number of slots in 360 degrees of rotation.
  */
 #define NUMBER_SLOTS            112
-/**
+
+/*
  * The number of yaw updates in 360 degrees of rotation.
  */
 #define YAW_FULL_ROTATION       (NUMBER_SLOTS * 4)
@@ -20,24 +21,38 @@
  * Initialises the yaw manager.
  */
 void YawDetectionInit(void);
+
 /**
- * Returns the current yaw in notches.
+ * Get the current yaw.
+ *
+ * @return the yaw (notches)
  */
 int32_t GetYaw(void);
+
 /**
- * Returns the current yaw in degrees.
+ * Get the current yaw.
+ *
+ * @return the yaw (degrees)
  */
 int32_t GetYawDegrees(void);
+
 /**
- * Returns the closest reference yaw to the actual yaw value.
+ * Helper function to return the closest yaw such that the helicopter is facing towards the camera.
+ *
+ * @param current_yaw the current yaw
+ * @return the closest reference yaw
  */
-int32_t GetClosestYawRef(int32_t yaw);
+int32_t GetClosestYawRef(int32_t current_yaw);
+
 /**
- * Enables the reference yaw trigger interrupt.
+ * Triggers an interrupt to fire when the refernce yaw has been found.
  */
 void YawRefTrigger(void);
+
 /**
- * Returns true if the reference yaw has been found.
+ * Check if the reference yaw has been found.
+ *
+ * @return true if the yaw reference has been found else false
  */
 bool YawRefFound(void);
 

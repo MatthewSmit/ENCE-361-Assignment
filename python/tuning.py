@@ -4,7 +4,6 @@ Python module to find optimal parameters for helicopter rig.
 Author: Daniel van Wichen
 Date: 2017-05-27
 """
-from builtins import len
 
 import numpy
 from numpy.fft import rfft, rfftfreq
