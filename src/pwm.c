@@ -127,6 +127,12 @@ uint32_t GetPwmDutyCycle(uint8_t pwm_output) {
     return duty_cycle;
 }
 
+/**
+ * Set the output state for the given PWM output.
+ *
+ * @param pwm_output The PWM output, either Tail or Main.
+ * @param state The output state, either true (on) or false (off);
+ */
 void SetPwmState(uint8_t pwm_output, bool state) {
 	switch (pwm_output) {
 	case MAIN_ROTOR:

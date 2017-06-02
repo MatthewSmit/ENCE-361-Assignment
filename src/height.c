@@ -16,6 +16,11 @@
 #include "height.h"
 
 /**
+ * The ADC interrupt handler for the height sensor.
+ */
+void AdcHandler(void);
+
+/**
  * ADC height sensor definitions.
  * @{
  */
@@ -32,7 +37,7 @@ static uint32_t zero_reading;
 static bool ref_found = false;
 static volatile uint32_t adc_val;
 
-void AdcHandler() {
+void AdcHandler(void) {
     uint32_t adc_buf[1];
     ADCSequenceDataGet(ADC_BASE, ADC_SEQUENCE, adc_buf);
     ADCIntClear(ADC_BASE, ADC_SEQUENCE);

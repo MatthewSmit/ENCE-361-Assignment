@@ -41,6 +41,7 @@ void PidInit(PidState *state);
 void PreloadPid(PidState *state, int32_t integral_preload);
 
 /**
+ * Update the pid controller loop.
  *
  * @param state The pid error state.
  * @param error The current error.

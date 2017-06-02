@@ -27,12 +27,17 @@
 #include "yaw.h"
 #include "yaw_controller.h"
 
+/**
+ * Forward declarations.
+ * @{
+ */
 void TimerInit(void);
 void TimerHandler(void);
 void UpdateError(void);
 void ResetError(void);
 bool HasReachedTargetYaw(void);
 bool HasReachedTargetHeight(void);
+/** @} */
 
 /**
  * Timer definitions.
