@@ -1,5 +1,7 @@
 /**
- * @file orbitOledInterface.c
+ * @file oled_interface.c
+ *
+ * @brief A simple interface to the Orbit OLED library.
  */
 
 #include "../lib/libOrbitOled/OrbitOled.h"

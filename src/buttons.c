@@ -16,29 +16,45 @@
 
 #include "buttons.h"
 
-/* UP Button */
+/**
+ * Up button definitions.
+ * @{
+ */
 #define BTN_UP_PERIPH           SYSCTL_PERIPH_GPIOE
 #define BTN_UP_BASE             GPIO_PORTE_BASE
 #define BTN_UP_PIN              GPIO_PIN_0
 #define BTN_UP_DEFAULT          0
+/** @} */
 
-/* DOWN Button */
+/**
+ * Down button definitions.
+ * @{
+ */
 #define BTN_DOWN_PERIPH         SYSCTL_PERIPH_GPIOD
 #define BTN_DOWN_BASE           GPIO_PORTD_BASE
 #define BTN_DOWN_PIN            GPIO_PIN_2
 #define BTN_DOWN_DEFAULT        0
+/** @} */
 
-/* LEFT Button */
+/**
+ * Left button definitions.
+ * @{
+ */
 #define BTN_LEFT_PERIPH         SYSCTL_PERIPH_GPIOF
 #define BTN_LEFT_BASE           GPIO_PORTF_BASE
 #define BTN_LEFT_PIN            GPIO_PIN_4
 #define BTN_LEFT_DEFAULT        1
+/** @} */
 
-/* RIGHT Button */
+/**
+ * Right button definitions.
+ * @{
+ */
 #define BTN_RIGHT_PERIPH        SYSCTL_PERIPH_GPIOF
 #define BTN_RIGHT_BASE          GPIO_PORTF_BASE
 #define BTN_RIGHT_PIN           GPIO_PIN_0
 #define BTN_RIGHT_DEFAULT       1
+/** @} */
 
 static bool default_state[NUM_BUTTONS];
 static bool current_state[NUM_BUTTONS];

@@ -29,38 +29,40 @@
 
 void TimerInit(void);
 void TimerHandler(void);
-void PriorityTaskDisable(void);
-void PriorityTaskEnable(void);
-void PriorityTaskInit(void);
 void UpdateError(void);
 void ResetError(void);
 bool HasReachedTargetYaw(void);
 bool HasReachedTargetHeight(void);
 
+/**
+ * Timer definitions.
+ * @{
+ */
 #define TIMER_PERIPH			SYSCTL_PERIPH_TIMER0
 #define TIMER_BASE				TIMER0_BASE
 #define TIMER_CONFIG			TIMER_CFG_PERIODIC
 #define TIMER_TIMER				TIMER_A
 #define TIMER_TIMEOUT			TIMER_TIMA_TIMEOUT
 #define TIMER_INT				INT_TIMER0A
+/** @} */
 
-/*
+/**
  * Rate of descent (ms per decrement of duty cycle)
  */
 #define RATE_OF_DESCENT			    35
 
-/*
+/**
  * Acceptable tolerance for yaw error (rotation unit defined in yaw.h)
  */
 #define YAW_SAMPLE_TOLERANCE        2
 
-/*
+/**
  * Acceptable tolerance for height error (%)
  */
 #define HEIGHT_SAMPLE_TOLERANCE     1
 
-/*
- * Number of samples to summate error over
+/**
+ * Number of samples to summate error over.
  */
 #define NUM_ERROR_SAMPLES           5
 
@@ -82,7 +84,9 @@ static const uint16_t height_tolerance = HEIGHT_SAMPLE_TOLERANCE * NUM_ERROR_SAM
 static uint16_t height_error_buf[NUM_ERROR_SAMPLES];
 
 static const char* flight_mode[] = { "Landed", "Init", "Flying", "Landing" };
-static uint8_t flight_state;
+static enum {
+    LANDED, INIT, FLYING, LANDING
+} flight_state = LANDED;
 
 void TimerHandler(void) {
     TimerIntClear(TIMER_BASE, TIMER_TIMEOUT);
@@ -128,7 +132,6 @@ void PriorityTaskEnable(void) {
 }
 
 void FlightControllerInit(void) {
-	flight_state = LANDED;
     PwmInit();
     SetTargetHeight(0);
     SetTargetYawDegrees(0);

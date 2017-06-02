@@ -16,17 +16,13 @@
 #ifndef FLIGHT_CONTROLLER_H_
 #define FLIGHT_CONTROLLER_H_
 
-enum {
-    LANDED, INIT, FLYING, LANDING
-};
-
 /**
- * Get this.
+ * Initialise the flight controller module.
  */
 void FlightControllerInit(void);
 
 /**
- * Get this.
+ * U
  */
 void UpdateFlightMode();
 
@@ -38,14 +34,20 @@ void UpdateFlightMode();
 const char* GetFlightMode(void);
 
 /**
- * Get this
+ * Initialise the priority task sequencer. This timer handles updating of the
+ * pid controllers and height.
  */
 void PriorityTaskInit(void);
 
 /**
- * Get this
+ * Enable the priority task sequencer.
  */
 void PriorityTaskEnable(void);
+
+/**
+ * Disable the priority task sequencer.
+ */
+void PriorityTaskDisable(void);
 
 #endif /* FLIGHT_CONTROLLER_H_ */
 

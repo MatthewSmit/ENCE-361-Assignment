@@ -1,8 +1,7 @@
-/*
- * reset.c
+/**
+ * @file reset.c
  *
- *  Created on: 2017-05-23
- *      Author: Matthew Smit
+ * @brief Soft reset module.
  */
 
 #include <stdbool.h>

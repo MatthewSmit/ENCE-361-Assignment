@@ -4,9 +4,8 @@
 
  Members                        | Descriptions                                
 --------------------------------|---------------------------------------------
-`define `[`NUM_POLLS`](#group__buttons__api_1ga8d6a287942d41da4e609bd81f411c02d)            | State changes only after so many consecutive readings have an opposite value.
+`define `[`NUM_POLLS`](#group__buttons__api_1ga8d6a287942d41da4e609bd81f411c02d)            | Change button state only after NUM_POLLS consecutive readings have an opposite value.
 `enum `[`@0`](#group__buttons__api_1ga06fc87d81c62e9abb8790b6e5713c55b)            | 
-`enum `[`@1`](#group__buttons__api_1gadf764cbdea00d65edcd07bb9953ad2b7)            | 
 `public void `[`ButtonsInit`](#group__buttons__api_1gac479c9466379bee2e17d33edf3a7162c)`(void)`            | Initialise the buttons.
 `public void `[`UpdateButtons`](#group__buttons__api_1ga652347f4782e34ffa799aa3fc3974ae4)`()`            | Update all of the buttons and their state.
 `public uint8_t `[`NumPushes`](#group__buttons__api_1ga0f572456b5d8ec1761a0e38e50c0a99f)`(uint8_t button_name)`            | Gets the number of pushes for a given button and resets the push count.
@@ -16,7 +15,7 @@
 
 #### `define `[`NUM_POLLS`](#group__buttons__api_1ga8d6a287942d41da4e609bd81f411c02d) 
 
-State changes only after so many consecutive readings have an opposite value.
+Change button state only after NUM_POLLS consecutive readings have an opposite value.
 
 #### `enum `[`@0`](#group__buttons__api_1ga06fc87d81c62e9abb8790b6e5713c55b) 
 
@@ -27,13 +26,6 @@ BTN_DOWN            |
 BTN_LEFT            | 
 BTN_RIGHT            | 
 NUM_BUTTONS            | 
-
-#### `enum `[`@1`](#group__buttons__api_1gadf764cbdea00d65edcd07bb9953ad2b7) 
-
- Values                         | Descriptions                                
---------------------------------|---------------------------------------------
-RELEASED            | 
-PUSHED            | 
 
 #### `public void `[`ButtonsInit`](#group__buttons__api_1gac479c9466379bee2e17d33edf3a7162c)`(void)` 
 

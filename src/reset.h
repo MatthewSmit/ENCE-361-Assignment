@@ -1,8 +1,7 @@
-/*
- * reset.h
+/**
+ * @file reset.h
  *
- *  Created on: 2017-05-23
- *      Author: Matthew Smit
+ * @brief Soft reset module.
  */
 
 #ifndef RESET_H_

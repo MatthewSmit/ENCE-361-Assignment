@@ -13,18 +13,12 @@
 #define BUTTONS_H_
 
 /**
- * State changes only after so many consecutive readings have an opposite value.
+ * Change button state only after NUM_POLLS consecutive readings have an opposite value.
  */
 #define NUM_POLLS 5
 
-/*
- * The available buttons.
- */
 enum {
     BTN_UP, BTN_DOWN, BTN_LEFT, BTN_RIGHT, NUM_BUTTONS
-};
-enum {
-    RELEASED, PUSHED
 };
 
 /**

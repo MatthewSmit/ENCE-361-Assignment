@@ -1,9 +1,7 @@
 /**
  * @file pid.c
- * @date
- * @brief A generic pid controller module.
  *
- *
+ * @brief Generic pid controller module.
  */
 
 #include <stdint.h>

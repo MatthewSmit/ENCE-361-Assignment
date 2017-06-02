@@ -1,6 +1,7 @@
 /**
- * @file HeightController.h
+ * @file height_controller.h
  *
+ * @brief Controller for the main rotor.
  */
 
 #ifndef HEIGHT_CONTROLLER_H_
@@ -17,4 +18,4 @@ void UpdateHeightController(uint32_t delta_t);
 
 void TuneProportionalMainRotor(double gain);
 
-#endif
+#endif /* HEIGHT_CONTROLLER_H_ */

@@ -1,7 +1,7 @@
 /**
- * @file HeightController.c
-
- * @author Daniel van Wichen
+ * @file height_controller.c
+ *
+ * @brief Controller for the main rotor.
  */
 
 #include <stdint.h>
