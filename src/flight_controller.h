@@ -49,4 +49,4 @@ void PriorityTaskEnable(void);
 
 #endif /* FLIGHT_CONTROLLER_H_ */
 
-/** @{ */
+/** @} */

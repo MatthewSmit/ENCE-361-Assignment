@@ -52,4 +52,4 @@ void ResetPushes(void);
 
 #endif /* BUTTONS_H_ */
 
-/** @{ */
+/** @} */
