@@ -8,4 +8,4 @@ doc/**/*
 *.idea/
 
 #Allow
-!doc/api/*
+!doc/api*
