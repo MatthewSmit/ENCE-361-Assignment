@@ -1,6 +1,7 @@
 /**
  * @file yaw_controller.h
  *
+ * @brief Controller for the Tail rotor.
  */
 
 #ifndef YAW_CONTROLLER_H_

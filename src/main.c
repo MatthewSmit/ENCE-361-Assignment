@@ -25,6 +25,8 @@
 #include "yaw.h"
 #include "yaw_controller.h"
 
+#define SYSTICK_FREQUENCY PWM_FREQUENCY
+
 #ifdef DEBUG
 void __error__(char *pcFilename, uint32_t ui32Line) {
     while (1) {
@@ -65,7 +67,7 @@ void Initialise(void) {
     //
     FPULazyStackingEnable();
 
-    SchedulerInit(PWM_FREQUENCY);
+    SchedulerInit(SYSTICK_FREQUENCY);
     SysTickIntRegister(SchedulerSysTickIntHandler);
 
     ResetInit();

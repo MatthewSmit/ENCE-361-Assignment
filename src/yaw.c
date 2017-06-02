@@ -1,7 +1,7 @@
 /**
  * @file yaw.c
  *
- * Handles the low level yaw detection.
+ * @brief Module to handle changes in yaw and detect the reference yaw position.
  */
 
 #include <stdint.h>

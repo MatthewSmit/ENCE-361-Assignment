@@ -1,8 +1,7 @@
-/*
- * serial.c
+/**
+ * @file serial_interface.c
  *
- *  Created on: 7/05/2017
- *      Author: daniel
+ * @brief Serial UART interface.
  */
 
 #include <stdbool.h>

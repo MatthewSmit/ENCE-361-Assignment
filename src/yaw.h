@@ -1,7 +1,7 @@
 /**
  * @file yaw.h
  *
- * Handles the all of the yaw and yaw reference detection.
+ * @brief Module to handle changes in yaw and detect the reference yaw position.
  */
 
 #ifndef YAW_H_

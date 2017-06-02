@@ -1,5 +1,7 @@
-/*
- * yaw_controller.c - Yaw Controller.
+/**
+ * @file yaw_controller.c
+ *
+ * @brief Controller for the Tail rotor.
  */
 
 #include <stdbool.h>

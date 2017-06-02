@@ -1,8 +1,7 @@
 /**
- * @file switch.h
+ * @file switch.c
  *
- * @author Matthew Smit
- * @date 2017-05-20
+ * @brief A module to operate the mode switch.
  */
 
 #ifndef SWITCH_H_

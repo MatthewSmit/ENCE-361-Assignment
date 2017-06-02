@@ -1,10 +1,8 @@
-/*
- * serialInterface.h
+/**
+ * @file serial_interface.h
  *
- *  Created on: 7/05/2017
- *      Author: daniel
+ * @brief Serial UART interface.
  */
-
 #ifndef SERIAL_INTERFACE_H_
 #define SERIAL_INTERFACE_H_
 

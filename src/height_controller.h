@@ -1,7 +1,7 @@
 /**
  * @file height_controller.h
  *
- * @brief Controller for the main rotor.
+ * @brief Controller for the Main rotor.
  */
 
 #ifndef HEIGHT_CONTROLLER_H_
