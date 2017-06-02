@@ -1,20 +1,31 @@
 /**
  * @file buttons.h
  *
- * @author Daniel van Wichen
- * @date 2017-05-27
+ * @brief A module to operate the buttons.
+ */
+
+/**
+ * @defgroup buttons_api ButtonsApi
+ * @{
  */
 
 #ifndef BUTTONS_H_
 #define BUTTONS_H_
 
-/*
+/**
  * State changes only after so many consecutive readings have an opposite value.
  */
 #define NUM_POLLS 5
 
-enum {BTN_UP, BTN_DOWN, BTN_LEFT, BTN_RIGHT, NUM_BUTTONS};
-enum {RELEASED, PUSHED};
+/*
+ * The available buttons.
+ */
+enum {
+    BTN_UP, BTN_DOWN, BTN_LEFT, BTN_RIGHT, NUM_BUTTONS
+};
+enum {
+    RELEASED, PUSHED
+};
 
 /**
  * Initialise the buttons.
@@ -40,3 +51,5 @@ uint8_t NumPushes(uint8_t button_name);
 void ResetPushes(void);
 
 #endif /* BUTTONS_H_ */
+
+/** @{ */

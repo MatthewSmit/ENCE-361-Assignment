@@ -1,5 +1,5 @@
 /**
- * Main Program
+ * Program to find optimal control gains.
  */
 
 #include <stdint.h>

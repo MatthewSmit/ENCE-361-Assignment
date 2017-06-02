@@ -1,8 +1,7 @@
 /**
  * @file buttons.c
  *
- * @author Daniel van Wichen
- * @date 25.03.2017
+ * @brief A module to operate the buttons.
  */
 
 #include <stdbool.h>
@@ -61,9 +60,11 @@ void ButtonsInit(void) {
     GPIOPinTypeGPIOInput(BTN_LEFT_BASE, BTN_LEFT_PIN);
     GPIOPadConfigSet(BTN_LEFT_BASE, BTN_LEFT_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
 
-    /* Unlock PF0 so we can change it to a GPIO input
-     Once we have enabled (unlocked) the commit register then re-lock it
-     to prevent further changes.  PF0 is muxed with NMI thus a special case. */
+    /*
+     * Unlock PF0 so we can change it to a GPIO input.
+     * Once we have enabled (unlocked) the commit register then re-lock it
+     * to prevent further changes.  PF0 is muxed with NMI thus a special case.
+     */
     HWREG(BTN_RIGHT_BASE + GPIO_O_LOCK) = GPIO_LOCK_KEY;
     HWREG(BTN_RIGHT_BASE + GPIO_O_CR) |= 0x01;
     HWREG(BTN_RIGHT_BASE + GPIO_O_LOCK) = 0;

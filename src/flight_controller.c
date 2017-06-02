@@ -1,9 +1,13 @@
-/*
- * flight_controller.c
+/**
+ * @file flight_controller.c
  *
- *  Created on: May 22, 2017
- *      Author: dpv11
+ * @brief Handles moving between flight modes.
+ *
+ * For example, the heli must initiate a landing sequence if it was previously
+ * flying if the mode switch was moved to the UP position. Also, this module
+ * a convenient method to get the current flight mode.
  */
+
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -44,14 +48,17 @@ bool HasReachedTargetHeight(void);
  * Rate of descent (ms per decrement of duty cycle)
  */
 #define RATE_OF_DESCENT			    35
+
 /*
- * Acceptable tolerance for yaw error (rotation unit defined in YAW_FULL_ROTATION)
+ * Acceptable tolerance for yaw error (rotation unit defined in yaw.h)
  */
 #define YAW_SAMPLE_TOLERANCE        2
+
 /*
  * Acceptable tolerance for height error (%)
  */
 #define HEIGHT_SAMPLE_TOLERANCE     1
+
 /*
  * Number of samples to summate error over
  */
@@ -332,4 +339,3 @@ void UpdateFlightMode() {
 const char* GetFlightMode(void) {
     return flight_mode[flight_state];
 }
-

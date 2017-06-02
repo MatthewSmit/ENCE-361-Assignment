@@ -1,3 +1,4 @@
+#Ignore
 .config/
 .launches/
 Debug/
@@ -5,3 +6,6 @@ Release/
 
 doc/
 *.idea/
+
+#Allow
+!doc/api.md
