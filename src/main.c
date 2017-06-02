@@ -90,9 +90,11 @@ void Draw() {
     int32_t target_yaw = GetTargetYawDegrees();
     char text_buffer[17];
     OledClearBuffer();
-    usnprintf(text_buffer, sizeof(text_buffer), "Alt: %d [%d]", height, target_height);
+    usnprintf(text_buffer, sizeof(text_buffer), "Alt: %d [%d]", height,
+            target_height);
     OledStringDraw(text_buffer, 0, 0);
-    usnprintf(text_buffer, sizeof(text_buffer), "Yaw: %d [%d]", yaw, target_yaw);
+    usnprintf(text_buffer, sizeof(text_buffer), "Yaw: %d [%d]", yaw,
+            target_yaw);
     OledStringDraw(text_buffer, 0, 1);
 }
 
@@ -112,8 +114,8 @@ void UpdateSerial() {
             "Yaw: %d [%d]\n"
             "Main: [%d] Tail: [%d]\n"
             "Mode: %s\n"
-            "\n", height, target_height, yaw, target_yaw, duty_cycle_main, duty_cycle_tail,
-            flight_mode);
+            "\n", height, target_height, yaw, target_yaw, duty_cycle_main,
+            duty_cycle_tail, flight_mode);
 }
 
 int main(void) {

@@ -80,7 +80,8 @@ void YawDetectionInit(void) {
      */
     SysCtlPeripheralEnable(YAW_PERIPH);
     GPIOPinTypeGPIOInput(YAW_BASE, YAW_GPIO_PINS);
-    GPIOPadConfigSet(YAW_BASE, YAW_GPIO_PINS, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPD);
+    GPIOPadConfigSet(YAW_BASE, YAW_GPIO_PINS, GPIO_STRENGTH_2MA,
+            GPIO_PIN_TYPE_STD_WPD);
     GPIODirModeSet(YAW_BASE, YAW_GPIO_PINS, GPIO_DIR_MODE_IN);
 
     /*
@@ -97,7 +98,8 @@ void YawDetectionInit(void) {
      */
     SysCtlPeripheralEnable(YAW_REF_PERIPH);
     GPIOPinTypeGPIOInput(YAW_REF_BASE, YAW_REF_PIN);
-    GPIOPadConfigSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+    GPIOPadConfigSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_STRENGTH_2MA,
+            GPIO_PIN_TYPE_STD_WPU);
     GPIODirModeSet(YAW_REF_BASE, YAW_REF_PIN, GPIO_DIR_MODE_IN);
 
     /*
@@ -127,7 +129,8 @@ int32_t GetClosestYawRef(int32_t current_yaw) {
     /*
      * Gets the yaw remainder, in the range [0, YAW_FULL_ROTATION).
      */
-    int32_t remainder = (current_yaw % YAW_FULL_ROTATION + YAW_FULL_ROTATION) % YAW_FULL_ROTATION;
+    int32_t remainder = (current_yaw % YAW_FULL_ROTATION + YAW_FULL_ROTATION)
+            % YAW_FULL_ROTATION;
     if (remainder >= YAW_FULL_ROTATION / 2)
         return current_yaw + YAW_FULL_ROTATION - remainder;
     else

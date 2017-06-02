@@ -31,7 +31,8 @@ void SwitchInit() {
     /* Switch is active high (default low) so are configured as pull down. */
     SysCtlPeripheralEnable(SWITCH_PERIPH);
     GPIOPinTypeGPIOInput(SWITCH_BASE, SWITCH_PIN);
-    GPIOPadConfigSet(SWITCH_BASE, SWITCH_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPD);
+    GPIOPadConfigSet(SWITCH_BASE, SWITCH_PIN, GPIO_STRENGTH_2MA,
+            GPIO_PIN_TYPE_STD_WPD);
 
     current_state = GPIOPinRead(SWITCH_BASE, SWITCH_PIN);
     event = SWITCH_DOWN;
@@ -43,8 +44,7 @@ void UpdateSwitch() {
 
     if (current_value != current_state) {
         count++;
-        if  (count >= NUM_POLLS)
-        {
+        if (count >= NUM_POLLS) {
             count = 0; // Reset the count
             current_state = current_value;
             event = current_value;

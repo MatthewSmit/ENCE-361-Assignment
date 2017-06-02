@@ -85,7 +85,8 @@ static uint16_t yaw_error_buf[NUM_ERROR_SAMPLES];
 /*
  * Tolerance to ascertain if height has reached target height.
  */
-static const uint16_t height_tolerance = HEIGHT_SAMPLE_TOLERANCE * NUM_ERROR_SAMPLES;
+static const uint16_t height_tolerance = HEIGHT_SAMPLE_TOLERANCE
+        * NUM_ERROR_SAMPLES;
 static uint16_t height_error_buf[NUM_ERROR_SAMPLES];
 
 static const char* flight_mode[] = { "Landed", "Init", "Flying", "Landing" };
@@ -149,7 +150,8 @@ void FlightControllerInit(void) {
 void UpdateError(void) {
     static uint32_t idx = 0;
     uint16_t yaw_sample_err = abs(GetYaw() - GetTargetYaw());
-    uint16_t height_sample_err = abs(GetHeightPercentage() - (int32_t) GetTargetHeight());
+    uint16_t height_sample_err = abs(
+            GetHeightPercentage() - (int32_t) GetTargetHeight());
     yaw_error_buf[idx] = yaw_sample_err;
     height_error_buf[idx] = height_sample_err;
     idx = (idx + 1) % NUM_ERROR_SAMPLES;
@@ -187,7 +189,7 @@ void UpdateFlightMode() {
     int32_t target_yaw;
     int32_t target_height;
 
-	switch (flight_state) {
+    switch (flight_state) {
 
     case LANDED: {
         if (event == SWITCH_UP) {
@@ -251,8 +253,11 @@ void UpdateFlightMode() {
                 if (GetTargetHeight() == 0) {
                     PreloadHeightController(20, height_inc);
                 }
-                target_height = GetTargetHeight() + presses[BTN_UP] * height_inc;
-                target_height = (target_height > height_max) ? height_max : target_height;
+                target_height = GetTargetHeight()
+                        + presses[BTN_UP] * height_inc;
+                target_height =
+                        (target_height > height_max) ?
+                                height_max : target_height;
                 SetTargetHeight(target_height);
             }
 
@@ -260,8 +265,11 @@ void UpdateFlightMode() {
              * Decrease height
              */
             if (presses[BTN_DOWN] > 0) {
-                target_height = GetTargetHeight() - presses[BTN_DOWN] * height_inc;
-                target_height = (target_height < height_min) ? height_min : target_height;
+                target_height = GetTargetHeight()
+                        - presses[BTN_DOWN] * height_inc;
+                target_height =
+                        (target_height < height_min) ?
+                                height_min : target_height;
                 SetTargetHeight(target_height);
             }
 
@@ -273,7 +281,8 @@ void UpdateFlightMode() {
                  * Rotate counter-clockwise
                  */
                 if (presses[BTN_LEFT] > 0) {
-                    target_yaw = GetTargetYawDegrees() - presses[BTN_LEFT] * yaw_inc;
+                    target_yaw = GetTargetYawDegrees()
+                            - presses[BTN_LEFT] * yaw_inc;
                     SetTargetYawDegrees(target_yaw);
                 }
 
@@ -281,7 +290,8 @@ void UpdateFlightMode() {
                  * Rotate clockwise
                  */
                 if (presses[BTN_RIGHT] > 0) {
-                    target_yaw = GetTargetYawDegrees() + presses[BTN_RIGHT] * yaw_inc;
+                    target_yaw = GetTargetYawDegrees()
+                            + presses[BTN_RIGHT] * yaw_inc;
                     SetTargetYawDegrees(target_yaw);
                 }
             }
@@ -317,8 +327,8 @@ void UpdateFlightMode() {
                  */
                 if (is_target_height_reached
                         && (is_target_yaw_reached
-                                || (SchedulerElapsedTicksGet(elapsed_ticks) * (1000 / PWM_FREQUENCY)
-                                        > 10000))) {
+                                || (SchedulerElapsedTicksGet(elapsed_ticks)
+                                        * (1000 / PWM_FREQUENCY) > 10000))) {
                     wait = false;
                     wait_2 = false;
                     PwmDisable(MAIN_ROTOR);
@@ -331,8 +341,8 @@ void UpdateFlightMode() {
 
             } else {
                 if (wait_2
-                        && ((SchedulerElapsedTicksGet(elapsed_ticks) * (1000 / PWM_FREQUENCY))
-                                >= RATE_OF_DESCENT)) {
+                        && ((SchedulerElapsedTicksGet(elapsed_ticks)
+                                * (1000 / PWM_FREQUENCY)) >= RATE_OF_DESCENT)) {
                     elapsed_ticks = SchedulerTickCountGet();
                     SetTargetHeight(GetTargetHeight() - 1);
                 }

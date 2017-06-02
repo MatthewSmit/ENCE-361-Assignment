@@ -1,5 +1,5 @@
 /**
- * @file switch.c
+ * @file switch.h
  *
  * @brief A module to operate the mode switch.
  */
@@ -7,8 +7,9 @@
 #ifndef SWITCH_H_
 #define SWITCH_H_
 
-/*
- * State changes only after so many consecutive readings have an opposite value
+/**
+ * Change switch state only after NUM_POLLS consecutive readings have an
+ * opposite value.
  */
 #define NUM_POLLS 5
 

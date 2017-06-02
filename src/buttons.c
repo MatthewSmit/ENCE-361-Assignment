@@ -65,16 +65,19 @@ void ButtonsInit(void) {
     /* UP and DOWN buttons are active high (default low) so are configured as pull down. */
     SysCtlPeripheralEnable(BTN_UP_PERIPH);
     GPIOPinTypeGPIOInput(BTN_UP_BASE, BTN_UP_PIN);
-    GPIOPadConfigSet(BTN_UP_BASE, BTN_UP_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPD);
+    GPIOPadConfigSet(BTN_UP_BASE, BTN_UP_PIN, GPIO_STRENGTH_2MA,
+            GPIO_PIN_TYPE_STD_WPD);
 
     SysCtlPeripheralEnable(BTN_DOWN_PERIPH);
     GPIOPinTypeGPIOInput(BTN_DOWN_BASE, BTN_DOWN_PIN);
-    GPIOPadConfigSet(BTN_DOWN_BASE, BTN_DOWN_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPD);
+    GPIOPadConfigSet(BTN_DOWN_BASE, BTN_DOWN_PIN, GPIO_STRENGTH_2MA,
+            GPIO_PIN_TYPE_STD_WPD);
 
     /* LEFT and RIGHT buttons are active low (default high) so are configured as pull up. */
     SysCtlPeripheralEnable(BTN_LEFT_PERIPH);
     GPIOPinTypeGPIOInput(BTN_LEFT_BASE, BTN_LEFT_PIN);
-    GPIOPadConfigSet(BTN_LEFT_BASE, BTN_LEFT_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+    GPIOPadConfigSet(BTN_LEFT_BASE, BTN_LEFT_PIN, GPIO_STRENGTH_2MA,
+            GPIO_PIN_TYPE_STD_WPU);
 
     /*
      * Unlock PF0 so we can change it to a GPIO input.
@@ -87,7 +90,8 @@ void ButtonsInit(void) {
 
     SysCtlPeripheralEnable(BTN_RIGHT_PERIPH);
     GPIOPinTypeGPIOInput(BTN_RIGHT_BASE, BTN_RIGHT_PIN);
-    GPIOPadConfigSet(BTN_RIGHT_BASE, BTN_RIGHT_PIN, GPIO_STRENGTH_2MA, GPIO_PIN_TYPE_STD_WPU);
+    GPIOPadConfigSet(BTN_RIGHT_BASE, BTN_RIGHT_PIN, GPIO_STRENGTH_2MA,
+            GPIO_PIN_TYPE_STD_WPU);
 
     /* Setup the default states of the buttons */
     default_state[BTN_UP] = BTN_UP_DEFAULT;

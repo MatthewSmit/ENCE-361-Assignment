@@ -70,7 +70,8 @@ void PwmInit() {
 
     PwmDisable(MAIN_ROTOR);
 
-    PWMGenConfigure(PWM_MAIN_BASE, PWM_MAIN_GEN, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
+    PWMGenConfigure(PWM_MAIN_BASE, PWM_MAIN_GEN,
+            PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
     PWMGenEnable(PWM_MAIN_BASE, PWM_MAIN_GEN);
 
     PWMGenPeriodSet(PWM_MAIN_BASE, PWM_MAIN_GEN, period);
@@ -85,7 +86,8 @@ void PwmInit() {
 
     PwmDisable(TAIL_ROTOR);
 
-    PWMGenConfigure(PWM_TAIL_BASE, PWM_TAIL_GEN, PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
+    PWMGenConfigure(PWM_TAIL_BASE, PWM_TAIL_GEN,
+            PWM_GEN_MODE_UP_DOWN | PWM_GEN_MODE_NO_SYNC);
     PWMGenEnable(PWM_TAIL_BASE, PWM_TAIL_GEN);
 
     PWMGenPeriodSet(PWM_TAIL_BASE, PWM_TAIL_GEN, period);
@@ -93,18 +95,18 @@ void PwmInit() {
 }
 
 void SetPwmDutyCycle(uint8_t pwm_output, uint32_t duty_cycle) {
-	ASSERT(!(duty_cycle < 2 || duty_cycle > 98));
-	uint32_t period = SysCtlClockGet() / PWM_DIVIDER / PWM_FREQUENCY;
-	switch (pwm_output) {
-	case MAIN_ROTOR:
-		PWMPulseWidthSet(PWM_MAIN_BASE, PWM_MAIN_OUTNUM,
-				period * duty_cycle / 100);
-		break;
-	case TAIL_ROTOR:
-		PWMPulseWidthSet(PWM_TAIL_BASE, PWM_TAIL_OUTNUM,
-				period * duty_cycle / 100);
-		break;
-	}
+    ASSERT(!(duty_cycle < 2 || duty_cycle > 98));
+    uint32_t period = SysCtlClockGet() / PWM_DIVIDER / PWM_FREQUENCY;
+    switch (pwm_output) {
+    case MAIN_ROTOR:
+        PWMPulseWidthSet(PWM_MAIN_BASE, PWM_MAIN_OUTNUM,
+                period * duty_cycle / 100);
+        break;
+    case TAIL_ROTOR:
+        PWMPulseWidthSet(PWM_TAIL_BASE, PWM_TAIL_OUTNUM,
+                period * duty_cycle / 100);
+        break;
+    }
 }
 
 uint32_t GetPwmDutyCycle(uint8_t pwm_output) {
@@ -134,16 +136,16 @@ uint32_t GetPwmDutyCycle(uint8_t pwm_output) {
  * @param state The output state, either true (on) or false (off);
  */
 void SetPwmState(uint8_t pwm_output, bool state) {
-	switch (pwm_output) {
-	case MAIN_ROTOR:
-		PWMOutputState(PWM_MAIN_BASE, PWM_MAIN_OUTBIT, state);
+    switch (pwm_output) {
+    case MAIN_ROTOR:
+        PWMOutputState(PWM_MAIN_BASE, PWM_MAIN_OUTBIT, state);
         pwm_state[MAIN_ROTOR] = state;
-		break;
-	case TAIL_ROTOR:
-		PWMOutputState(PWM_TAIL_BASE, PWM_TAIL_OUTBIT, state);
+        break;
+    case TAIL_ROTOR:
+        PWMOutputState(PWM_TAIL_BASE, PWM_TAIL_OUTBIT, state);
         pwm_state[TAIL_ROTOR] = state;
-		break;
-	}
+        break;
+    }
 }
 
 void PwmEnable(uint8_t pwm_output) {

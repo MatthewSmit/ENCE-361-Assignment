@@ -51,7 +51,7 @@ void PreloadPid(PidState *state, int32_t integral_preload);
  * @param derivative_gain The derivative gain constant.
  * @return
  */
-int32_t UpdatePid(PidState *state, int32_t error, uint32_t delta_t, double proportional_gain, double integral_gain,
-        double derivative_gain);
+int32_t UpdatePid(PidState *state, int32_t error, uint32_t delta_t,
+        double proportional_gain, double integral_gain, double derivative_gain);
 
 #endif /* PID_H_ */

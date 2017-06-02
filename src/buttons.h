@@ -13,7 +13,8 @@
 #define BUTTONS_H_
 
 /**
- * Change button state only after NUM_POLLS consecutive readings have an opposite value.
+ * Change button state only after NUM_POLLS consecutive readings have an
+ * opposite value.
  */
 #define NUM_POLLS 5
 

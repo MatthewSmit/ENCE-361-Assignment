@@ -12,7 +12,9 @@
  */
 #define PWM_FREQUENCY 200
 
-enum {MAIN_ROTOR, TAIL_ROTOR};
+enum {
+    MAIN_ROTOR, TAIL_ROTOR
+};
 
 /**
  * TODO
