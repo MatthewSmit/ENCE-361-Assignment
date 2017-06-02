@@ -5,7 +5,9 @@
  */
 
 /**
- * @defgroup yaw_api YawApi
+ * @addtogroup yaw_api
+ * @defgroup yaw_controller YawController
+ * @ingroup yaw_api
  * @{
  */
 
@@ -30,7 +32,7 @@ void SetTargetYawDegrees(int32_t yaw);
  * Get the target yaw.
  *
  * @return the target yaw.
- * @see yaw.h for rotation unit.
+ * @see yaw_api for rotation unit.
  */
 int32_t GetTargetYaw(void);
 

@@ -4,65 +4,61 @@
 
  Members                        | Descriptions                                
 --------------------------------|---------------------------------------------
-`public int32_t `[`GetTargetYawDegrees`](#group__yaw__api_1ga435932581c1f277dfe181c2728b65e83)`(void)`            | Get the target yaw in degrees.
-`public void `[`SetTargetYawDegrees`](#group__yaw__api_1gabdb3b3a0d712763ac13a83c5c0e8864b)`(int32_t yaw)`            | Set the desired target yaw (degrees).
-`public int32_t `[`GetTargetYaw`](#group__yaw__api_1ga8734cc39f5317745123f60ae67aa29be)`(void)`            | Get the target yaw.
-`public void `[`SetTargetYaw`](#group__yaw__api_1ga513fa55c1d246a94a7108cf85f23d98f)`(int32_t yaw)`            | #### Parameters
-`public void `[`YawControllerInit`](#group__yaw__api_1gab86837fccba07f66e1ab5d927a7b1be2)`(void)`            | Initialise the yaw controller.
-`public void `[`PreloadYawController`](#group__yaw__api_1ga8aea286d2f1cfce0a3af66951884fed2)`(int32_t control,int32_t error)`            | #### Parameters
-`public void `[`UpdateYawController`](#group__yaw__api_1ga78c3b56e9af57a40f5266b292006a302)`(uint32_t delta_t)`            | #### Parameters
-`public void `[`TuneProportionalTailRotor`](#group__yaw__api_1ga96f25cf144fccb4efc3003607ad1e8c6)`(double gain)`            | Use at own risk.
+`define `[`NUMBER_SLOTS`](#group__yaw__api_1ga11955ca482e9e323eebf0d1a701b1996)            | The number of slots in 360 degrees of rotation.
+`define `[`YAW_FULL_ROTATION`](#group__yaw__api_1ga2f05011aeb1385dbb7363d09314ab642)            | The number of yaw updates in 360 degrees of rotation.
+`public void `[`YawDetectionInit`](#group__yaw__api_1gab3cb00bee4d4de9d6074a250bd8f1074)`(void)`            | Initialises the yaw manager.
+`public int32_t `[`GetYaw`](#group__yaw__api_1gadaaf694619119fa84d322a954e0e6036)`(void)`            | Get the current yaw.
+`public int32_t `[`GetYawDegrees`](#group__yaw__api_1ga44afb9dcc9f3c83ec4964ff1e02f1654)`(void)`            | Get the current yaw.
+`public int32_t `[`GetClosestYawRef`](#group__yaw__api_1ga9b958da6564c22a3327eb7798791591c)`(int32_t current_yaw)`            | Helper function to return the closest yaw such that the helicopter is facing towards the camera.
+`public void `[`YawRefTrigger`](#group__yaw__api_1ga5a3d6aaf1269b785b0d63ba836da100e)`(void)`            | Triggers an interrupt to fire when the refernce yaw has been found.
+`public bool `[`YawRefFound`](#group__yaw__api_1ga4b3ae61946ab9780a82f65c3979d8687)`(void)`            | Check if the reference yaw has been found.
 
 ## Members
 
-#### `public int32_t `[`GetTargetYawDegrees`](#group__yaw__api_1ga435932581c1f277dfe181c2728b65e83)`(void)` 
+#### `define `[`NUMBER_SLOTS`](#group__yaw__api_1ga11955ca482e9e323eebf0d1a701b1996) 
 
-Get the target yaw in degrees.
+The number of slots in 360 degrees of rotation.
 
-#### Returns
-The target yaw in degrees.
+#### `define `[`YAW_FULL_ROTATION`](#group__yaw__api_1ga2f05011aeb1385dbb7363d09314ab642) 
 
-#### `public void `[`SetTargetYawDegrees`](#group__yaw__api_1gabdb3b3a0d712763ac13a83c5c0e8864b)`(int32_t yaw)` 
+The number of yaw updates in 360 degrees of rotation.
 
-Set the desired target yaw (degrees).
+#### `public void `[`YawDetectionInit`](#group__yaw__api_1gab3cb00bee4d4de9d6074a250bd8f1074)`(void)` 
 
-#### Parameters
-* `yaw` The desired target yaw (degrees).
+Initialises the yaw manager.
 
-#### `public int32_t `[`GetTargetYaw`](#group__yaw__api_1ga8734cc39f5317745123f60ae67aa29be)`(void)` 
+#### `public int32_t `[`GetYaw`](#group__yaw__api_1gadaaf694619119fa84d322a954e0e6036)`(void)` 
 
-Get the target yaw.
+Get the current yaw.
 
 #### Returns
-the target yaw. 
+the yaw (notches)
 
-**See also**: [yaw.h](#yaw_8h) for rotation unit.
+#### `public int32_t `[`GetYawDegrees`](#group__yaw__api_1ga44afb9dcc9f3c83ec4964ff1e02f1654)`(void)` 
 
-#### `public void `[`SetTargetYaw`](#group__yaw__api_1ga513fa55c1d246a94a7108cf85f23d98f)`(int32_t yaw)` 
+Get the current yaw.
 
-#### Parameters
-* `yaw`
+#### Returns
+the yaw (degrees)
 
-#### `public void `[`YawControllerInit`](#group__yaw__api_1gab86837fccba07f66e1ab5d927a7b1be2)`(void)` 
+#### `public int32_t `[`GetClosestYawRef`](#group__yaw__api_1ga9b958da6564c22a3327eb7798791591c)`(int32_t current_yaw)` 
 
-Initialise the yaw controller.
-
-#### `public void `[`PreloadYawController`](#group__yaw__api_1ga8aea286d2f1cfce0a3af66951884fed2)`(int32_t control,int32_t error)` 
+Helper function to return the closest yaw such that the helicopter is facing towards the camera.
 
 #### Parameters
-* `control` 
+* `current_yaw` the current yaw 
 
-* `error`
+#### Returns
+the closest reference yaw
 
-#### `public void `[`UpdateYawController`](#group__yaw__api_1ga78c3b56e9af57a40f5266b292006a302)`(uint32_t delta_t)` 
+#### `public void `[`YawRefTrigger`](#group__yaw__api_1ga5a3d6aaf1269b785b0d63ba836da100e)`(void)` 
 
-#### Parameters
-* `delta_t`
+Triggers an interrupt to fire when the refernce yaw has been found.
 
-#### `public void `[`TuneProportionalTailRotor`](#group__yaw__api_1ga96f25cf144fccb4efc3003607ad1e8c6)`(double gain)` 
+#### `public bool `[`YawRefFound`](#group__yaw__api_1ga4b3ae61946ab9780a82f65c3979d8687)`(void)` 
 
-Use at own risk.
+Check if the reference yaw has been found.
 
-#### Parameters
-* `gain`
+#### Returns
+true if the yaw reference has been found else false
 

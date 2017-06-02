@@ -4,6 +4,11 @@
  * @brief Module to handle changes in yaw and detect the reference yaw position.
  */
 
+/**
+ * @defgroup yaw_api YawApi
+ * @{
+ */
+
 #ifndef YAW_H_
 #define YAW_H_
 
@@ -57,3 +62,5 @@ void YawRefTrigger(void);
 bool YawRefFound(void);
 
 #endif /* YAW_H_ */
+
+/** @} */
