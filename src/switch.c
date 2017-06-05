@@ -13,15 +13,13 @@
 
 #include "switch.h"
 
-/**
+/*
  * Switch definitions.
- * @{
  */
 #define SWITCH_PERIPH           SYSCTL_PERIPH_GPIOA
 #define SWITCH_BASE             GPIO_PORTA_BASE
 #define SWITCH_PIN              GPIO_PIN_7
 #define SWITCH_DEFAULT          0
-/** @} */
 
 static bool current_state;
 static bool event;

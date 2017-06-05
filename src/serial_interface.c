@@ -16,9 +16,8 @@
 
 #include "serial_interface.h"
 
-/**
+/*
  * UART definitions.
- * @{
  */
 #define UART_BASE               UART0_BASE
 #define UART_PORT               0
@@ -29,7 +28,6 @@
 #define UART_GPIO_TX_PIN        GPIO_PIN_1
 #define UART_PERIPH_UART        SYSCTL_PERIPH_UART0
 #define UART_PIOSC_FREQUENCY    16000000
-/** @} */
 
 void SerialInit() {
     SysCtlPeripheralEnable(SYSCTL_PERIPH_GPIOA);

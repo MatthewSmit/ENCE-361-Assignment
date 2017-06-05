@@ -16,9 +16,8 @@
 
 #include "pwm.h"
 
-/**
+/*
  * PWM Main rotor definitions.
- * @{
  */
 #define PWM_MAIN_BASE           PWM0_BASE
 #define PWM_MAIN_GEN            PWM_GEN_3
@@ -29,11 +28,9 @@
 #define PWM_MAIN_GPIO_BASE      GPIO_PORTC_BASE
 #define PWM_MAIN_GPIO_CONFIG    GPIO_PC5_M0PWM7
 #define PWM_MAIN_GPIO_PIN       GPIO_PIN_5
-/** @} */
 
-/**
+/*
  * PWM Tail rotor definitions.
- * @{
  */
 #define PWM_TAIL_BASE           PWM1_BASE
 #define PWM_TAIL_GEN            PWM_GEN_2
@@ -44,15 +41,12 @@
 #define PWM_TAIL_GPIO_BASE      GPIO_PORTF_BASE
 #define PWM_TAIL_GPIO_CONFIG    GPIO_PF1_M1PWM5
 #define PWM_TAIL_GPIO_PIN       GPIO_PIN_1
-/** @} */
 
-/**
+/*
  * General PWM definitions.
- * @{
  */
 #define PWM_DIVIDER_CODE        SYSCTL_PWMDIV_16
 #define PWM_DIVIDER             16
-/** @} */
 
 static bool pwm_state[2];
 

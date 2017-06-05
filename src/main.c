@@ -25,14 +25,14 @@
 #include "yaw.h"
 #include "yaw_controller.h"
 
-#define SYSTICK_FREQUENCY PWM_FREQUENCY
-
 #ifdef DEBUG
 void __error__(char *pcFilename, uint32_t ui32Line) {
     while (1) {
     }
 }
 #endif
+
+#define SYSTICK_FREQUENCY PWM_FREQUENCY
 
 /*
  * Register task function prototypes.

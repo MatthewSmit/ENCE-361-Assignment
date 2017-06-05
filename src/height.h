@@ -13,7 +13,7 @@
 #ifndef HEIGHT_H_
 #define HEIGHT_H_
 
-/**
+/*
  * The range of the height sensor for a 100% height reading.
  *
  * This translates to a 0.8 V sensor range using the 12-bit ADC peripheral.

@@ -15,9 +15,8 @@
 
 #include "yaw.h"
 
-/**
+/*
  * Yaw definitions.
- * @{
  */
 #define YAW_PERIPH              SYSCTL_PERIPH_GPIOB
 #define YAW_BASE                GPIO_PORTB_BASE
@@ -27,15 +26,13 @@
 #define YAW_INT                 INT_GPIOB
 /** @} */
 
-/**
+/*
  * Reference yaw definitions.
- * @{
  */
 #define YAW_REF_PERIPH          SYSCTL_PERIPH_GPIOC
 #define YAW_REF_BASE            GPIO_PORTC_BASE
 #define YAW_REF_PIN             GPIO_PIN_4
 #define YAW_REF_INT             INT_GPIOC
-/** @} */
 
 static volatile int32_t yaw = 0;
 static volatile bool ref_found = false;

@@ -12,14 +12,24 @@
 #ifndef SWITCH_H_
 #define SWITCH_H_
 
-/**
+/*
  * Change switch state only after NUM_POLLS consecutive readings have an
  * opposite value.
  */
 #define NUM_POLLS 5
 
-enum {
-    SWITCH_DOWN, SWITCH_UP
+/**
+ * An enumeration of the states of the slider switch.
+ */
+enum SwitchState {
+    /**
+     * The switch is in the downwards position.
+     */
+    SWITCH_DOWN,
+    /**
+     * The switch is in the upwards position.
+     */
+    SWITCH_UP
 };
 
 /**

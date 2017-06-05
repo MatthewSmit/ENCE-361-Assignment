@@ -12,14 +12,36 @@
 #ifndef BUTTONS_H_
 #define BUTTONS_H_
 
-/**
+/*
  * Change button state only after NUM_POLLS consecutive readings have an
  * opposite value.
  */
 #define NUM_POLLS 5
 
-enum {
-    BTN_UP, BTN_DOWN, BTN_LEFT, BTN_RIGHT, NUM_BUTTONS
+/**
+ * All of the buttons.
+ */
+enum Button {
+    /**
+     * The UP button.
+     */
+    BTN_UP,
+    /**
+     * The DOWN button.
+     */
+    BTN_DOWN,
+    /**
+     * The LEFT button.
+     */
+    BTN_LEFT,
+    /**
+     * The RIGHT button.
+     */
+    BTN_RIGHT,
+    /**
+     * The total number of buttons.
+     */
+    NUM_BUTTONS
 };
 
 /**
@@ -35,8 +57,8 @@ void UpdateButtons();
 /**
  * Gets the number of pushes for a given button and resets the push count.
  *
- * @param button_name one of BUT_UP, BUT_DOWN, BUT_LEFT or BUT_RIGHT
- * @return the number of pushes for the given button since last called
+ * @param button_name One of #BTN_UP, #BTN_DOWN, #BTN_LEFT, or #BTN_RIGHT.
+ * @return The number of pushes for the given button since this function was last called.
  */
 uint8_t NumPushes(uint8_t button_name);
 

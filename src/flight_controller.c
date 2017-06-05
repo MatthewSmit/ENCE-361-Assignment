@@ -39,9 +39,8 @@ bool HasReachedTargetYaw(void);
 bool HasReachedTargetHeight(void);
 /** @} */
 
-/**
+/*
  * Timer definitions.
- * @{
  */
 #define TIMER_PERIPH			SYSCTL_PERIPH_TIMER0
 #define TIMER_BASE				TIMER0_BASE
@@ -49,24 +48,23 @@ bool HasReachedTargetHeight(void);
 #define TIMER_TIMER				TIMER_A
 #define TIMER_TIMEOUT			TIMER_TIMA_TIMEOUT
 #define TIMER_INT				INT_TIMER0A
-/** @} */
 
-/**
+/*
  * Rate of descent (ms per decrement of duty cycle)
  */
 #define RATE_OF_DESCENT			    35
 
-/**
+/*
  * Acceptable tolerance for yaw error (rotation unit defined in yaw.h)
  */
 #define YAW_SAMPLE_TOLERANCE        2
 
-/**
+/*
  * Acceptable tolerance for height error (%)
  */
 #define HEIGHT_SAMPLE_TOLERANCE     1
 
-/**
+/*
  * Number of samples to summate error over.
  */
 #define NUM_ERROR_SAMPLES           5

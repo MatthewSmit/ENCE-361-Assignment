@@ -36,8 +36,9 @@ void SetTargetYawDegrees(int32_t yaw);
 int32_t GetTargetYaw(void);
 
 /**
+ * Set the desired target yaw.
  *
- * @param yaw
+ * @param yaw The desired target yaw.
  */
 void SetTargetYaw(int32_t yaw);
 
@@ -47,22 +48,28 @@ void SetTargetYaw(int32_t yaw);
 void YawControllerInit(void);
 
 /**
+ * Preload the integral component of the pid contoller so the Tail rotor starts of
+ * with @p control power.
  *
- * @param control
- * @param error
+ * Can be used in conjuction with @ref PreloadHeightController to improve the
+ * rise time of the helicopter.
+ *
+ * @param control The immediate control power desired by the Tail rotor
+ * @param error The absolute difference between current yaw and target yaw.
  */
 void PreloadYawController(int32_t control, int32_t error);
 
 /**
+ * Update the yaw controller pid loop.
  *
- * @param delta_t
+ * @param delta_t The update period of the yaw controller.
  */
 void UpdateYawController(uint32_t delta_t);
 
 /**
  * Use at own risk.
  *
- * @param gain
+ * @param gain Proportial gain.
  */
 void TuneProportionalTailRotor(double gain);
 

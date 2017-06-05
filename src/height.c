@@ -20,9 +20,8 @@
  */
 void AdcHandler(void);
 
-/**
+/*
  * ADC height sensor definitions.
- * @{
  */
 #define ADC_GPIO_BASE       GPIO_PORTE_BASE
 #define ADC_GPIO_PIN        GPIO_PIN_4
@@ -31,7 +30,6 @@ void AdcHandler(void);
 #define ADC_CHANNEL         ADC_CTL_CH9
 #define ADC_PERIPH_ADC      SYSCTL_PERIPH_ADC0
 #define ADC_PERIPH_GPIO     SYSCTL_PERIPH_GPIOE
-/** @} */
 
 static uint32_t zero_reading;
 static bool ref_found = false;

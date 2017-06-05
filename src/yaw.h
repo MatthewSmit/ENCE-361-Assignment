@@ -12,12 +12,12 @@
 #ifndef YAW_H_
 #define YAW_H_
 
-/**
+/*
  * The number of slots in 360 degrees of rotation.
  */
 #define NUMBER_SLOTS            112
 
-/**
+/*
  * The number of yaw updates in 360 degrees of rotation.
  */
 #define YAW_FULL_ROTATION       (NUMBER_SLOTS * 4)

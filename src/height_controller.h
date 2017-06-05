@@ -33,8 +33,8 @@ uint32_t GetTargetHeight(void);
 void HeightControllerInit(void);
 
 /**
- * Preload the integral component of the pid contoller so the Main rotor start of
- * with @param control power.
+ * Preload the integral component of the pid contoller so the Main rotor starts of
+ * with @p control power.
  *
  * This was to improves rise time of the helicopter by boosting the Main rotor.
  *
@@ -53,7 +53,7 @@ void UpdateHeightController(uint32_t delta_t);
 /**
  * Use at own risk.
  *
- * @param gain
+ * @param gain Proportial gain.
  */
 void TuneProportionalMainRotor(double gain);
 

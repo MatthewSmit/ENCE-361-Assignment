@@ -15,15 +15,13 @@
 
 #include "reset.h"
 
-/**
+/*
  * Reset GPIO definitions.
- * @{
  */
 #define RESET_PERIPH_GPIO       SYSCTL_PERIPH_GPIOA
 #define RESET_PERIPH_BASE       GPIO_PORTA_BASE
 #define RESET_PIN               GPIO_PIN_6
 #define RESET_INT               INT_GPIOA
-/** @} */
 
 static void ResetHandler(void) {
     GPIOIntClear(RESET_PERIPH_BASE, RESET_PIN);
