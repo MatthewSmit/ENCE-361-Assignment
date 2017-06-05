@@ -1,12 +1,15 @@
-# Helicopter Project
+# Helicopter Rig Control Project
+
+## Project structure
+
 The project is sorted into various subfolders.
 - doc - Doxygen generated documentation
 - lib - The libraries used.
-- python - The python script for the PID controller.
+- python - The python script and data files for the PID controller tuning.
 - src - The source code.
 - test - Various test programs for checking functionality.
 
-### Source files
+## Source files
 The files in src are sorted into various modules.
 - buttons.c - Module operating button presses.
 - flight_controller.c - Handles moving between flight modes.
@@ -21,3 +24,13 @@ The files in src are sorted into various modules.
 - switch.c - A module to handle the mode switch.
 - yaw.c - A module to handle changes in yaw and detect reference yaw.
 - yaw_controller.c - PID controller for the tail rotor.
+
+## Contributers
+
+Daniel van Wichen <dpv11@uclive.ac.nz>
+
+Matthew Smit
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
