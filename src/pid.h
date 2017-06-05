@@ -6,6 +6,8 @@
 
 /**
  * @defgroup pid_api PidController
+ *
+ * Generic pid controller module.
  * @{
  */
 

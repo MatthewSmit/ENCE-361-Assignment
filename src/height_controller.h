@@ -1,12 +1,14 @@
 /**
  * @file height_controller.h
  *
- * @brief Pid controller for the Main rotor.
+ * @brief Pid controller for the main rotor.
  */
 
 /**
  * @defgroup height_controller HeightController
  * @ingroup pid_api
+ *
+ * Pid controller for the main rotor.
  * @{
  */
 

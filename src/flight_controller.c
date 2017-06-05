@@ -1,11 +1,7 @@
 /**
  * @file flight_controller.c
  *
- * @brief Handles moving between flight modes.
- *
- * For example, the heli must initiate a landing sequence if it was previously
- * flying if the mode switch was moved to the UP position. Also, this module
- * a convenient method to get the current flight mode.
+ * @brief Handles moving between flight states and scheduling of critical tasks.
  */
 
 #include <stdbool.h>

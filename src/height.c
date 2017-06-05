@@ -2,7 +2,7 @@
  * @file height.c
  *
  * @brief Module to acquire current height via the height sensor and trigger a
- * zero-height reading. Provides helper methods to get height.
+ * zero-height reading. Provides helper methods to get the current height.
  */
 
 #include <stdbool.h>

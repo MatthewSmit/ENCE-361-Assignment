@@ -6,6 +6,8 @@
 
 /**
  * @defgroup switch_api SwitchApi
+ *
+ * A module to operate the mode switch.
  * @{
  */
 

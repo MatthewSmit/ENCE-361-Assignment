@@ -1,11 +1,13 @@
 /**
  * @file pwm.h
  *
- * @brief PWM module to handle the power output for the Main and Tail rotors.
+ * @brief PWM module to handle the power output for the main and tail rotors.
  */
 
 /**
  * @defgroup pwm_api PwmOutput
+ *
+ * PWM module to handle the power output for the main and tail rotors.
  * @{
  */
 
@@ -22,11 +24,11 @@
  */
 enum PwmOutput {
     /**
-     * The Main rotor PWM output.
+     * The main rotor PWM output.
      */
     MAIN_ROTOR,
     /**
-     * The Tail rotor PWM output.
+     * The tail rotor PWM output.
      */
     TAIL_ROTOR
 };

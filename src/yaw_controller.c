@@ -1,7 +1,7 @@
 /**
  * @file yaw_controller.h
  *
- * @brief Pid controller for the Tail rotor.
+ * @brief Pid controller for the tail rotor.
  */
 
 #include <stdbool.h>

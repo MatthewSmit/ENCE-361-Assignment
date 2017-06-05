@@ -6,6 +6,8 @@
 
 /**
  * @defgroup buttons_api ButtonsApi
+ *
+ * A module to operate the buttons.
  * @{
  */
 

@@ -1,5 +1,10 @@
 /**
- * Main Program
+ * @file main.c
+ *
+ * Main program.
+ *
+ * Sequences initialisation of peripherals and modules, and starts up the
+ * task scheduler.
  */
 
 #include <stdint.h>
@@ -60,11 +65,11 @@ void Initialise(void) {
     SysCtlClockSet(
     SYSCTL_SYSDIV_2_5 | SYSCTL_USE_PLL | SYSCTL_OSC_MAIN | SYSCTL_XTAL_16MHZ);
 
-    //
-    // Enable lazy stacking for interrupt handlers.  This allows floating-point
-    // instructions to be used within interrupt handlers, but at the expense of
-    // extra stack usage.
-    //
+    /*
+     * Enable lazy stacking for interrupt handlers.  This allows floating-point
+     * instructions to be used within interrupt handlers, but at the expense of
+     * extra stack usage.
+     */
     FPULazyStackingEnable();
 
     SchedulerInit(SYSTICK_FREQUENCY);

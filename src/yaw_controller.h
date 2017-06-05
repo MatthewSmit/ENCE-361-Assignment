@@ -1,12 +1,14 @@
 /**
  * @file yaw_controller.h
  *
- * @brief Pid controller for the Tail rotor.
+ * @brief Pid controller for the tail rotor.
  */
 
 /**
  * @defgroup yaw_controller YawController
  * @ingroup pid_api
+ *
+ * Pid controller for the tail rotor.
  * @{
  */
 
@@ -31,7 +33,6 @@ void SetTargetYawDegrees(int32_t yaw);
  * Get the target yaw.
  *
  * @return the target yaw.
- * @see yaw_api for rotation unit.
  */
 int32_t GetTargetYaw(void);
 
