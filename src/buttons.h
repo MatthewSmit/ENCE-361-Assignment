@@ -19,7 +19,7 @@
 #define NUM_POLLS 5
 
 /**
- * All of the buttons.
+ * The buttons.
  */
 enum Button {
     /**

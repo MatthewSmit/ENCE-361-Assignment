@@ -43,7 +43,7 @@ void SwitchInit(void);
 void UpdateSwitch();
 
 /**
- * Get the switch event.
+ * Get the lastest switch event.
  *
  * @return DOWN or UP slide of the switch.
  */
