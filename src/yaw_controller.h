@@ -1,13 +1,12 @@
 /**
  * @file yaw_controller.h
  *
- * @brief Controller for the Tail rotor.
+ * @brief Pid controller for the Tail rotor.
  */
 
 /**
- * @addtogroup yaw_api
  * @defgroup yaw_controller YawController
- * @ingroup yaw_api
+ * @ingroup pid_api
  * @{
  */
 

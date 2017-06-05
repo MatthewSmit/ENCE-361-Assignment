@@ -1,7 +1,7 @@
 /**
- * @file height_controller.c
+ * @file height_controller.h
  *
- * @brief Controller for the Main rotor.
+ * @brief Pid controller for the Main rotor.
  */
 
 #include <stdint.h>

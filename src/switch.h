@@ -4,6 +4,11 @@
  * @brief A module to operate the mode switch.
  */
 
+/**
+ * @defgroup switch_api SwitchApi
+ * @{
+ */
+
 #ifndef SWITCH_H_
 #define SWITCH_H_
 
@@ -35,3 +40,5 @@ void UpdateSwitch();
 uint8_t GetSwitchEvent(void);
 
 #endif /* SWITCH_H_ */
+
+/** @} */

@@ -4,6 +4,11 @@
  * @brief Generic pid controller module.
  */
 
+/**
+ * @defgroup pid_api PidController
+ * @{
+ */
+
 #ifndef PID_H_
 #define PID_H_
 
@@ -55,3 +60,5 @@ int32_t UpdatePid(PidState *state, int32_t error, uint32_t delta_t,
         double proportional_gain, double integral_gain, double derivative_gain);
 
 #endif /* PID_H_ */
+
+/** @} */
